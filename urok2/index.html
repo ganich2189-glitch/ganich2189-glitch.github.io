@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Площадки: полная навигация — урок 2 MENSORRY</title>
+<style>
+
+:root{
+  --bg:#0a0a0b; --card:#131316; --card2:#18181c; --card3:#1d1d22; --line:#232327; --line2:#2e2e35;
+  --txt:#e4e4e7; --num:#fafafa; --mut:#8b8b94;
+  --acc:#8b5cf6; --acc2:#a78bfa; --acc3:#c4b5fd; --green:#22c55e; --red:#ef4444; --red2:#f87171; --cyan:#38bdf8; --pink:#f472b6;
+  --side:300px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-size:18px;line-height:1.5}
+.num{font-variant-numeric:tabular-nums}
+a{color:var(--acc2)}
+button{font-family:inherit}
+/* ---------- каркас ---------- */
+.app{display:grid;grid-template-columns:var(--side) 1fr;height:100vh;overflow:hidden}
+.toc{background:#0d0d0f;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;transition:margin .3s}
+.brand{padding:24px 22px 18px;border-bottom:1px solid var(--line)}
+.brand b{display:flex;align-items:center;font-size:20px;color:var(--num);letter-spacing:-.02em}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--acc);box-shadow:0 0 12px var(--acc);margin-right:10px}
+.brand span{display:block;color:var(--mut);font-size:14px;margin-top:4px}
+.toc ol{list-style:none;margin:0;padding:12px 12px;overflow-y:auto;flex:1}
+.toc li{margin:2px 0}
+.toc a{display:flex;gap:12px;align-items:center;padding:9px 12px;border-radius:12px;color:var(--mut);text-decoration:none;font-size:15px;font-weight:500;transition:.15s;line-height:1.3}
+.toc a i{font-style:normal;flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--card2);color:var(--mut);font-size:13px;font-weight:700;transition:.15s}
+.toc a:hover{color:var(--txt);background:var(--card)}
+.toc a.on{color:var(--num);background:var(--card2)}
+.toc a.on i{background:var(--acc);color:#fff;box-shadow:0 4px 14px rgba(139,92,246,.4)}
+.toc a.seen:not(.on) i{color:var(--acc2)}
+.keys{padding:14px 22px 20px;border-top:1px solid var(--line);color:var(--mut);font-size:14px;line-height:1.7}
+kbd{display:inline-block;min-width:24px;padding:1px 7px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:7px;background:var(--card2);color:var(--txt);font:600 13px Inter,sans-serif;text-align:center}
+.stage{position:relative;min-width:0;overflow:hidden}
+.progress{position:absolute;left:0;right:0;top:0;height:4px;background:#17171a;z-index:5}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#6d28d9,#a78bfa);box-shadow:0 0 14px rgba(139,92,246,.6);transition:width .5s cubic-bezier(.2,.7,.2,1)}
+.slide{position:absolute;inset:4px 0 76px 0;overflow-y:auto;opacity:0;visibility:hidden;transform:translateX(40px);transition:opacity .45s ease,transform .55s cubic-bezier(.2,.7,.2,1),visibility 0s .55s}
+.slide.back{transform:translateX(-40px)}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .45s ease,transform .55s cubic-bezier(.2,.7,.2,1),visibility 0s}
+.in{max-width:1320px;margin:0 auto;padding:40px 56px 30px}
+.ctrl{position:absolute;left:0;right:0;bottom:0;height:76px;display:flex;align-items:center;gap:12px;padding:0 28px;border-top:1px solid var(--line);background:rgba(10,10,11,.92);backdrop-filter:blur(8px);z-index:5}
+.btn{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:11px 20px;font:600 15px Inter,sans-serif;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{border-color:#3f3f46;color:var(--num)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:0 4px 14px rgba(139,92,246,.35)}
+.btn.pri:hover{background:#7c3aed}
+.btn.on{border-color:var(--acc);color:var(--acc3);box-shadow:0 0 0 3px rgba(139,92,246,.18)}
+.ctrl .count{color:var(--mut);font-size:15px;font-weight:600;margin:0 6px}
+.ctrl .count b{color:var(--num)}
+.ctrl .sp{flex:1}
+.ctrl .cur{color:var(--txt);font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.edge{position:absolute;top:4px;bottom:76px;width:54px;z-index:4;cursor:pointer;display:grid;place-items:center;color:transparent;font-size:28px;transition:.2s}
+.edge:hover{color:var(--acc2);background:linear-gradient(90deg,rgba(139,92,246,.10),transparent)}
+.edge.r{right:0}.edge.r:hover{background:linear-gradient(270deg,rgba(139,92,246,.10),transparent)}
+.edge.l{left:0}
+/* ---------- типографика слайда ---------- */
+.kick{display:inline-flex;align-items:center;gap:10px;color:var(--acc2);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+.kick em{font-style:normal;background:rgba(139,92,246,.14);border-radius:8px;padding:3px 9px}
+h1{font-size:62px;line-height:1.05;letter-spacing:-.035em;color:var(--num);margin:0 0 18px;font-weight:800}
+h2{font-size:40px;line-height:1.12;letter-spacing:-.03em;color:var(--num);margin:0 0 10px;font-weight:800}
+h3{font-size:21px;line-height:1.3;color:var(--num);margin:0 0 10px;font-weight:700;letter-spacing:-.01em}
+.lead{color:#b4b4bc;font-size:20px;max-width:900px;margin:0 0 26px}
+p{margin:0 0 10px}
+.mut{color:var(--mut)}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.split{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}
+.split2{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 24px;box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 10px 30px -12px rgba(0,0,0,.6);position:relative}
+.card.soft{background:var(--card2)}
+.card.accent{border-color:rgba(139,92,246,.45);background:linear-gradient(180deg,rgba(139,92,246,.10),rgba(139,92,246,.02)),var(--card)}
+.card.warn{border-color:rgba(239,68,68,.40);background:linear-gradient(180deg,rgba(239,68,68,.09),rgba(239,68,68,.02)),var(--card)}
+.card.ok{border-color:rgba(34,197,94,.38);background:linear-gradient(180deg,rgba(34,197,94,.08),rgba(34,197,94,.01)),var(--card)}
+.ico{width:42px;height:42px;border-radius:12px;display:inline-grid;place-items:center;background:rgba(139,92,246,.14);color:var(--acc2);font-size:20px;font-weight:700;margin-bottom:12px}
+.lbl{color:var(--mut);font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+.big{color:var(--num);font-size:52px;font-weight:800;letter-spacing:-.035em;line-height:1.05;margin:10px 0 6px;white-space:nowrap}
+.big small{font-size:24px;color:var(--mut);font-weight:700;margin-left:4px}
+.list{list-style:none;margin:0;padding:0}
+.list li{position:relative;padding:7px 0 7px 30px}
+.list li::before{content:"";position:absolute;left:4px;top:16px;width:10px;height:10px;border-radius:4px;background:var(--acc)}
+.list.x li::before{content:"✕";background:none;color:var(--red2);font-weight:800;top:6px;left:2px;width:auto;height:auto}
+.list.v li::before{content:"✓";background:none;color:var(--green);font-weight:800;top:6px;left:2px;width:auto;height:auto}
+code,.mono{font-family:"Roboto Mono",ui-monospace,Menlo,monospace;font-size:.92em;background:#1f1f25;border:1px solid var(--line2);border-radius:8px;padding:2px 8px;color:var(--acc3)}
+.src{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--mut);text-decoration:none;border:1px solid var(--line2);border-radius:999px;padding:3px 10px;margin:8px 6px 0 0;transition:.15s}
+.src:hover{color:var(--acc3);border-color:var(--acc)}
+.src.off::before{content:"OFF";color:var(--green);font-weight:800}
+.src.trd::before{content:"3rd";color:var(--cyan);font-weight:800}
+.note{display:flex;gap:12px;align-items:flex-start;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:14px 18px;font-size:16px;color:#c9c9d1}
+.note b{color:var(--num)}
+.note.red{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.07)}
+.note .ni{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:rgba(139,92,246,.18);color:var(--acc3);font-weight:800;font-size:15px}
+.note.red .ni{background:rgba(239,68,68,.18);color:var(--red2)}
+.pill{display:inline-block;padding:4px 12px;border-radius:999px;font-size:14px;font-weight:600;background:rgba(139,92,246,.14);color:var(--acc3)}
+.pill.g{background:rgba(34,197,94,.12);color:var(--green)}
+.pill.r{background:rgba(239,68,68,.12);color:var(--red2)}
+.pill.c{background:rgba(56,189,248,.12);color:var(--cyan)}
+.mt{margin-top:18px}.mt2{margin-top:26px}
+.tl{list-style:none;margin:0;padding:0;position:relative}
+.tl::before{content:"";position:absolute;left:21px;top:8px;bottom:8px;width:2px;background:linear-gradient(#7c3aed,#2e2e35)}
+.tl li{display:flex;gap:16px;align-items:flex-start;padding:8px 0;position:relative}
+.tl li>b{flex:none;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--card2);border:1px solid var(--line2);color:var(--acc3);font-weight:800;font-size:17px;z-index:1}
+.tl li.key>b{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 4px 14px rgba(139,92,246,.4)}
+.tl li>div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 16px;flex:1}
+.tl h4{margin:0;font-size:18px;color:var(--num)}.tl p{margin:4px 0 0;color:#b4b4bc;font-size:16px}
+.pl-rail{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}.pl-rail a{padding:6px 14px;border-radius:999px;border:1px solid var(--line2);color:var(--mut);text-decoration:none;font-size:14px;font-weight:600}.pl-rail a:hover,.pl-rail a.on{border-color:var(--acc);color:var(--acc3)}
+.pt{width:100%;border-collapse:collapse;font-size:16px}.pt th{text-align:left;color:var(--mut);font-size:13px;text-transform:uppercase;letter-spacing:.08em;padding:12px 16px}.pt td{padding:11px 16px;border-top:1px solid var(--line);vertical-align:top}.pt td:first-child{width:170px;color:var(--num)}
+.scr{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:10px;background:#0b0b0e;border:2px solid var(--line2);border-radius:16px;padding:12px;margin-top:8px;min-height:240px}
+.scr .col{display:flex;flex-direction:column;gap:10px}.scr span{flex:1;display:grid;place-items:center;border-radius:12px;background:var(--card2);border:1px solid var(--line2);font-weight:700;color:var(--txt);font-size:15px;padding:14px 6px}
+.scr .mid span{background:rgba(139,92,246,.16);border-color:rgba(139,92,246,.55);color:var(--num)}.scr i{font-style:normal;text-align:center;color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
+.slide.active .scr span{animation:pop .5s ease both}.slide.active .scr .mid span{animation:pop .5s ease both,glow 2.4s 1s infinite}
+.cpy{background:#0f0f12;border:1px solid var(--line2);border-radius:16px;overflow:hidden}.cpy-h{display:flex;justify-content:space-between;align-items:center;padding:8px 10px 8px 16px;border-bottom:1px solid var(--line);color:var(--mut);font-size:14px;font-weight:600}.cpy-h .btn{padding:6px 14px;font-size:13px}
+.cpy pre{margin:0;padding:16px 18px;font:15px/1.6 "Roboto Mono",monospace;color:var(--acc3);white-space:pre-wrap}
+/* ---------- анимации ---------- */
+.rv{opacity:0;transform:translateY(18px)}
+.slide.active .rv{animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--i,0) * 85ms + 100ms)}
+.slide.active .rv.hold{animation:none;opacity:0;transform:translateY(18px)}
+.slide.active .rv.now{animation-delay:0s}
+@keyframes rise{to{opacity:1;transform:none}}
+.meter{height:12px;border-radius:999px;background:#232327;overflow:hidden}
+.meter i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#7c3aed,#a78bfa);transition:width 1.3s cubic-bezier(.2,.7,.2,1) .35s}
+.slide.active .meter i{width:var(--w)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(139,92,246,.65)}70%{box-shadow:0 0 0 14px rgba(139,92,246,0)}100%{box-shadow:0 0 0 0 rgba(139,92,246,0)}}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 2px rgba(139,92,246,.0)}50%{box-shadow:0 0 0 3px rgba(139,92,246,.55),0 0 22px rgba(139,92,246,.35)}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+/* ---------- схемы интерфейса ---------- */
+.shot{margin:0;position:relative;background:#0f0f12;border:1px dashed #3a3a44;border-radius:18px;padding:18px 18px 18px;overflow:visible}
+.shot-tag{position:absolute;top:-13px;left:16px;background:#0f0f12;border:1px solid #3a3a44;border-radius:999px;padding:2px 12px;font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--acc3);text-transform:uppercase;z-index:2}
+.shot-tag::before{content:"◩ ";color:var(--acc)}
+.shot.has-shot .shot-tag{color:var(--green)}
+.shot .real{display:block;width:100%;border-radius:12px}
+.shot.has-shot .mock{display:none}
+.shot figcaption{color:var(--mut);font-size:14px;margin-top:12px}
+.mock{font-size:15px;color:#d4d4d8}
+.win{background:#151519;border:1px solid #2a2a31;border-radius:14px;overflow:hidden}
+.win-h{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#1b1b20;border-bottom:1px solid #2a2a31;color:var(--mut);font-size:14px;font-weight:600}
+.win-h i{width:11px;height:11px;border-radius:50%;background:#3a3a42;display:inline-block}
+.win-b{padding:16px}
+.f{position:relative;border-radius:10px;transition:box-shadow .3s}
+.f.hl{animation:glow 1.4s ease-in-out infinite}
+.fld{display:flex;align-items:center;gap:10px;background:#0f0f12;border:1px solid #2c2c33;border-radius:10px;padding:10px 12px;min-height:44px}
+.fl{color:var(--mut);font-size:14px;font-weight:600;margin:10px 0 6px}
+.pin{position:absolute;z-index:3;width:30px;height:30px;border-radius:50%;background:var(--acc);color:#fff;font-size:15px;font-weight:800;display:grid;place-items:center;border:2px solid #0f0f12;transform:scale(0)}
+.slide.active .pin{animation:pop .45s cubic-bezier(.2,.7,.2,1) forwards,pulse 2.2s 1s infinite;animation-delay:calc(var(--p,0) * 260ms + 500ms),calc(var(--p,0) * 260ms + 1100ms)}
+.pin.tr{right:-12px;top:-14px}.pin.tl{left:-12px;top:-14px}.pin.br{right:-12px;bottom:-14px}.pin.r{right:-14px;top:50%;margin-top:-15px}
+.shot.has-shot .pin{display:none}
+.callouts{list-style:none;margin:0;padding:0;counter-reset:c}
+.callouts li{display:flex;gap:14px;align-items:flex-start;padding:12px 14px;border-radius:14px;border:1px solid transparent;transition:.25s;cursor:default}
+.callouts li>b{flex:none;width:30px;height:30px;border-radius:50%;background:var(--card3);color:var(--acc3);display:grid;place-items:center;font-size:15px;font-weight:800;transition:.25s}
+.callouts li.hl{background:var(--card2);border-color:rgba(139,92,246,.45)}
+.callouts li.hl>b{background:var(--acc);color:#fff}
+.callouts li div{font-size:17px}
+.callouts li div strong{color:var(--num);display:block;font-size:17px}
+/* chaturbate-подобные элементы */
+.room{display:grid;grid-template-columns:1fr 300px;gap:0}
+.video{aspect-ratio:16/9;background:radial-gradient(circle at 50% 40%,#2a2340,#121216 70%);display:grid;place-items:center;color:#5b5b66;font-weight:700;letter-spacing:.1em;font-size:14px;position:relative}
+.video .live{position:absolute;left:12px;top:12px;background:var(--red);color:#fff;font-size:13px;font-weight:800;border-radius:6px;padding:2px 8px;letter-spacing:.05em}
+.chat{border-left:1px solid #2a2a31;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:14px;background:#131317}
+.chat p{margin:0}.chat .u{color:var(--acc2);font-weight:700}.chat .fc{color:var(--green);font-weight:700}.chat .sys{color:var(--mut)}
+.subj{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#101014;border-bottom:1px solid #2a2a31;padding:12px 14px;font-size:16px;color:var(--num);font-weight:600}
+.subj .tg{color:var(--cyan);font-weight:600}
+.goalbar{padding:12px 14px;border-top:1px solid #2a2a31;background:#101014}
+.goalbar .gl{display:flex;justify-content:space-between;font-size:14px;color:var(--mut);margin-bottom:8px;font-weight:600}
+.goalbar .gl b{color:var(--num)}
+.tm{display:flex;flex-direction:column;gap:6px}
+.tm-row{display:flex;justify-content:space-between;align-items:center;background:#0f0f12;border:1px solid #2a2a31;border-radius:10px;padding:10px 14px;font-size:16px}
+.tm-row b{color:var(--num);font-variant-numeric:tabular-nums}
+.tm-row.first{border-color:rgba(139,92,246,.55);background:rgba(139,92,246,.08)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid #2a2a31;padding:0 14px;background:#1b1b20}
+.tabs span{padding:10px 14px;font-size:14px;font-weight:600;color:var(--mut);border-bottom:2px solid transparent}
+.tabs span.on{color:var(--num);border-color:var(--acc)}
+.sel{display:flex;justify-content:space-between;align-items:center}
+.sel::after{content:"▾";color:var(--mut)}
+.tog{width:40px;height:22px;border-radius:999px;background:var(--acc);position:relative;flex:none}
+.tog::after{content:"";position:absolute;right:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff}
+.tog.offt{background:#3a3a42}.tog.offt::after{right:auto;left:3px}
+/* шаги */
+.steps{counter-reset:s;display:grid;gap:12px}
+.stp{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.stp .n{flex:none;width:40px;height:40px;border-radius:12px;background:rgba(139,92,246,.16);color:var(--acc3);display:grid;place-items:center;font-weight:800;font-size:18px}
+.stp h3{margin:2px 0 4px;font-size:19px}
+.stp p{margin:0;color:#c3c3cb;font-size:17px}
+/* таймлайн */
+.tl{position:relative;padding-left:34px}
+.tl::before{content:"";position:absolute;left:12px;top:8px;bottom:8px;width:3px;border-radius:3px;background:linear-gradient(180deg,#7c3aed,#2e2e35)}
+.tli{position:relative;margin-bottom:12px}
+.tli::before{content:"";position:absolute;left:-29px;top:20px;width:15px;height:15px;border-radius:50%;background:var(--bg);border:3px solid var(--acc)}
+.tli .card{padding:14px 18px;display:grid;grid-template-columns:130px 1fr 1fr;gap:18px;align-items:start}
+.tli .t{color:var(--num);font-size:22px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.tli .t small{display:block;color:var(--mut);font-size:13px;font-weight:600;letter-spacing:0}
+.tli .say{background:#0f0f12;border:1px solid var(--line2);border-left:3px solid var(--acc);border-radius:10px;padding:8px 12px;font-size:15px;color:#d4d4d8}
+.tli .say b{color:var(--acc3);font-size:13px;text-transform:uppercase;letter-spacing:.06em;display:block}
+.tli .act{font-size:16px;color:#d4d4d8}
+.tli .act strong{color:var(--num)}
+/* часы */
+.clock{display:grid;grid-template-columns:repeat(24,1fr);gap:4px;margin-top:8px}
+.hr{height:70px;border-radius:8px;background:#1a1a1f;position:relative;transform-origin:bottom;transform:scaleY(.2);opacity:0}
+.slide.active .hr{animation:grow .5s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--h) * 35ms + 300ms)}
+@keyframes grow{to{transform:none;opacity:1}}
+.hr.us{background:linear-gradient(180deg,#8b5cf6,#5b21b6)}
+.hr.eu{background:linear-gradient(180deg,#38bdf8,#0369a1)}
+.hr.both{background:linear-gradient(180deg,#38bdf8 0 50%,#8b5cf6 50%)}
+.hr.sh{background:repeating-linear-gradient(135deg,#2a2a33 0 6px,#1a1a1f 6px 12px);border:1px dashed #4a4a55}
+.hlabels{display:grid;grid-template-columns:repeat(24,1fr);gap:4px;margin-top:8px}
+.hlabels span{text-align:center;color:var(--mut);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.lg{display:flex;gap:18px;flex-wrap:wrap;margin-top:16px;font-size:15px;color:#c9c9d1}
+.lg span{display:inline-flex;align-items:center;gap:8px}
+.lg i{width:16px;height:16px;border-radius:5px;display:inline-block}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.day{border-radius:14px;padding:14px 8px;text-align:center;background:var(--card2);border:1px solid var(--line)}
+.day b{display:block;font-size:20px;color:var(--num)}
+.day span{font-size:13px;color:var(--mut);font-weight:600}
+.day.top{background:rgba(139,92,246,.16);border-color:rgba(139,92,246,.55)}
+.day.top span{color:var(--acc3)}
+.day.mid{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.35)}
+.day.mid span{color:var(--cyan)}
+/* чек-листы */
+.chk{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.chk li{display:flex;gap:14px;align-items:flex-start;padding:11px 14px;border-radius:12px;background:var(--card2);border:1px solid var(--line);cursor:pointer;user-select:none;transition:.2s;font-size:17px}
+.chk li:hover{border-color:#3f3f46}
+.chk li::before{content:"";flex:none;width:24px;height:24px;border-radius:8px;border:2px solid #4a4a55;margin-top:1px;transition:.2s;display:grid;place-items:center;font-size:15px;font-weight:900;color:#fff}
+.chk li.done{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.06)}
+.chk li.done::before{content:"✓";background:var(--green);border-color:var(--green)}
+.chk li.done span{color:var(--mut);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.25)}
+.ring{width:150px;height:150px;position:relative;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:12}
+.ring .bgc{stroke:#232327}
+.ring .fgc{stroke:url(#rg);stroke-linecap:round;transition:stroke-dashoffset .6s cubic-bezier(.2,.7,.2,1)}
+.ring div{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring b{font-size:34px;color:var(--num);font-weight:800;line-height:1}
+.ring span{display:block;font-size:13px;color:var(--mut);font-weight:600;margin-top:4px}
+/* примеры тем */
+.ex{display:flex;flex-direction:column;gap:10px}
+.exi{display:flex;gap:14px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--card2);border:1px solid var(--line)}
+.exi .m{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-weight:900}
+.exi.good .m{background:rgba(34,197,94,.15);color:var(--green)}
+.exi.bad .m{background:rgba(239,68,68,.15);color:var(--red2)}
+.exi .s{font-family:"Roboto Mono",ui-monospace,monospace;font-size:15px;color:var(--num);word-break:break-word}
+.exi .w{font-size:15px;color:var(--mut);margin-top:4px}
+/* твит */
+.tw{background:#0f0f12;border:1px solid #2a2a31;border-radius:14px;padding:16px}
+.tw-h{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.ava{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#38bdf8)}
+.tw-h b{color:var(--num);display:block;font-size:16px}.tw-h span{color:var(--mut);font-size:14px}
+.tw-media{height:120px;border-radius:12px;background:radial-gradient(circle at 30% 40%,#2a2340,#141418 70%);display:grid;place-items:center;color:#5b5b66;font-weight:700;font-size:13px;letter-spacing:.08em;margin-top:10px}
+/* титул */
+.hero{min-height:calc(100vh - 160px);display:flex;flex-direction:column;justify-content:center}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;pointer-events:none}
+.badge-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
+.funnel{display:grid;gap:10px}
+.fn{display:flex;align-items:center;gap:16px;padding:14px 20px;border-radius:14px;background:linear-gradient(90deg,rgba(139,92,246,.22),rgba(139,92,246,.06));border:1px solid rgba(139,92,246,.35);margin:0 auto;width:100%}
+.fn b{color:var(--num);font-size:18px}.fn span{color:#c3c3cb;font-size:16px}
+.fn .k{flex:none;width:36px;height:36px;border-radius:10px;background:var(--acc);color:#fff;display:grid;place-items:center;font-weight:800}
+table.t{width:100%;border-collapse:separate;border-spacing:0 6px;font-size:17px}
+table.t th{color:var(--mut);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;text-align:left;padding:2px 14px}
+table.t td{background:var(--card2);padding:12px 14px}
+table.t td:first-child{border-radius:12px 0 0 12px}
+table.t td:last-child{border-radius:0 12px 12px 0}
+table.t td.r,table.t th.r{text-align:right}
+table.t .money{color:var(--num);font-weight:800;font-size:20px}
+.period{display:grid;grid-template-columns:15fr 16fr;gap:6px;margin-top:10px}
+.period div{border-radius:12px;padding:12px 14px;font-weight:700;color:var(--num);font-size:16px}
+.period div span{display:block;font-weight:500;color:#c9c9d1;font-size:14px}
+.p1{background:linear-gradient(90deg,rgba(139,92,246,.35),rgba(139,92,246,.15))}
+.p2{background:linear-gradient(90deg,rgba(56,189,248,.28),rgba(56,189,248,.10))}
+.srcs{columns:2;column-gap:28px}
+.srcs li{break-inside:avoid;margin-bottom:10px;font-size:16px;line-height:1.4}
+.srcs li a{word-break:break-all;font-size:14px}
+.srcs b{color:var(--num)}
+.menu-btn{display:none}
+@media (max-width:1180px){
+  :root{--side:0px}
+  .toc{position:absolute;z-index:9;width:300px;height:100%;margin-left:-300px}
+  body.toc-open .toc{margin-left:0}
+  .app{grid-template-columns:1fr}
+  .menu-btn{display:inline-flex}
+  .g4,.g5{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .split,.split2,.g3{grid-template-columns:1fr}
+  .in{padding:30px 28px}
+  h1{font-size:44px}h2{font-size:32px}
+  .tli .card{grid-template-columns:1fr}
+  .room{grid-template-columns:1fr}
+  .srcs{columns:1}
+}
+@media (max-width:640px){.g2,.g4,.g5{grid-template-columns:1fr}.ctrl .cur{display:none}.days{grid-template-columns:repeat(4,1fr)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+@media print{.toc,.ctrl,.edge,.progress{display:none}.app{display:block;height:auto}.stage{overflow:visible}.slide{position:relative;opacity:1;visibility:visible;transform:none;inset:auto;page-break-after:always}.rv,.pin,.hr{opacity:1!important;transform:none!important}}
+
+
+.imgwrap{position:relative;border-radius:12px;line-height:0}
+.imgwrap img{width:100%;height:auto;display:block;border-radius:12px;border:1px solid #2a2a31;cursor:zoom-in}
+.hot{position:absolute;left:var(--l);top:var(--t);width:var(--w);height:var(--h);border:2px solid var(--acc);border-radius:8px;opacity:0;transform:scale(.85);transition:background .3s,border-color .3s,box-shadow .3s;pointer-events:none}
+.slide.active .hot{animation:hotin .45s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--p,0) * 260ms + 450ms)}
+@keyframes hotin{to{opacity:1;transform:none}}
+.hot::after{content:attr(data-n);position:absolute;left:-15px;top:-15px;width:28px;height:28px;border-radius:50%;background:var(--acc);color:#fff;font:800 14px/28px Inter,sans-serif;text-align:center;border:2px solid #0f0f12}
+.hot.r::after{left:auto;right:-15px}
+.hot.hl{border-color:#ddd6fe;background:rgba(139,92,246,.16);box-shadow:0 0 0 4px rgba(139,92,246,.35),0 0 26px rgba(139,92,246,.5)}
+.hot.hl::after{animation:pulse 1.6s infinite}
+.zoom-hint{position:absolute;right:10px;bottom:10px;line-height:1;background:rgba(10,10,11,.8);border:1px solid var(--line2);color:var(--txt);font-size:13px;font-weight:600;border-radius:999px;padding:5px 10px;pointer-events:none}
+.shot.real .shot-tag{color:var(--green)}
+.shot.real .shot-tag::before{content:"● ";color:var(--green)}
+.itabs{margin-top:14px}.itabs>input{display:none!important}.itabs .tl{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.itabs .tl label{cursor:pointer;padding:7px 16px;border-radius:999px;border:1px solid var(--line2);color:var(--mut);font-weight:600;font-size:14px;transition:.25s}
+.itabs .tl label:hover{color:var(--txt)}.itabs .tp{display:none;animation:tpIn .45s cubic-bezier(.2,.7,.2,1)}
+@keyframes tpIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#it1:checked~.tl label[for=it1],#it2:checked~.tl label[for=it2],#it3:checked~.tl label[for=it3],#it4:checked~.tl label[for=it4]{background:var(--acc);border-color:var(--acc);color:#fff}
+#it1:checked~.tp1,#it2:checked~.tp2,#it3:checked~.tp3,#it4:checked~.tp4{display:block}
+.tp .imgwrap img{max-height:46vh;object-fit:contain;object-position:top;background:#0f0f12}
+#lb{position:fixed;inset:0;background:rgba(5,5,7,.92);z-index:50;display:none;place-items:center;padding:30px;cursor:zoom-out}
+#lb.on{display:grid}
+#lb img{max-width:96vw;max-height:90vh;border-radius:12px;border:1px solid #333}
+#lb span{position:absolute;top:16px;right:24px;color:var(--txt);font-size:15px}
+pre.code{margin:0;background:#0d0d10;border:1px solid var(--line2);border-radius:14px;padding:16px 18px;font:14.5px/1.6 "Roboto Mono",ui-monospace,monospace;color:#d4d4d8;white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto}
+pre.code .tg{color:#f472b6}pre.code .at{color:#7dd3fc}pre.code .ph{background:rgba(244,114,182,.18);color:#fbcfe8;border-radius:5px;padding:0 4px}pre.code .cm{color:#71717a}
+.vs2{display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.vs2>div{padding:18px 20px}
+.vs2>div:first-child{background:rgba(139,92,246,.10);border-right:1px solid var(--line)}
+.vs2>div:last-child{background:var(--card2)}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed #2a2a31;font-size:17px}
+.kv:last-child{border-bottom:0}
+.kv b{color:var(--num);font-variant-numeric:tabular-nums;text-align:right}
+.order{counter-reset:o;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px}
+.order li{list-style:none;display:flex;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-size:17px}
+.order li::before{counter-increment:o;content:counter(o);flex:none;width:36px;height:36px;border-radius:11px;background:rgba(139,92,246,.16);color:var(--acc3);display:grid;place-items:center;font-weight:800}
+.order li.key{border-color:rgba(139,92,246,.5)}
+.order li.key::before{background:var(--acc);color:#fff}
+.order{padding:0;margin:0}
+.ladder{display:flex;flex-direction:column;gap:8px}
+.rung{display:grid;grid-template-columns:130px 1fr;gap:14px;align-items:center}
+.rung .p{color:var(--num);font-weight:800;font-size:18px;font-variant-numeric:tabular-nums;text-align:right}
+.rung .b{border-radius:12px;padding:10px 14px;font-size:16px;color:#e4e4e7;background:linear-gradient(90deg,rgba(139,92,246,var(--a)),rgba(139,92,246,.04));border:1px solid rgba(139,92,246,.3)}
+.rung .b b{color:var(--num)}
+.colors{display:grid;gap:6px}
+.colors div{display:flex;align-items:center;gap:12px;font-size:16px;background:var(--card2);border-radius:10px;padding:8px 12px}
+.colors i{width:14px;height:14px;border-radius:5px;flex:none}
+.colors b{min-width:150px;color:var(--num)}
+.lv{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.lv div{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.lv b{display:block;color:var(--num);font-size:20px;font-variant-numeric:tabular-nums}
+.lv span{color:var(--mut);font-size:14px}
+.lv div.gap{border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.07)}
+.lv div.gap span{color:var(--red2)}
+
+.src.int::before{content:"СТУДИЯ";color:var(--pink);font-weight:800}
+.static .slide.active .rv,.static .slide.active .pin,.static .slide.active .hr{animation:none!important;opacity:1!important;transform:none!important}.static .slide{transition:none!important}.static .rv,.static .pin,.static .hot,.static .hr{animation-duration:.01s!important;animation-delay:0s!important}.static .meter i{transition:none!important}
+/* ---------- дополнения для уроков ---------- */
+.hero h1{font-size:72px}
+.numh{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.numh .n{flex:none;min-width:46px;height:46px;padding:0 8px;border-radius:14px;display:grid;place-items:center;background:rgba(139,92,246,.16);color:var(--acc3);font-weight:800;font-size:19px;font-variant-numeric:tabular-nums}
+.card.warn .numh .n{background:rgba(239,68,68,.16);color:var(--red2)}
+.card.ok .numh .n{background:rgba(34,197,94,.14);color:var(--green)}
+.numh h3{margin:0}
+.card p{color:#c3c3cb;font-size:17px;margin:0}
+.card p+p{margin-top:8px}
+.card:hover{border-color:#3a3a44}
+.card.accent:hover{border-color:rgba(139,92,246,.7)}
+.card{transition:border-color .2s,transform .2s}
+.lift:hover{transform:translateY(-3px)}
+.tagrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:13px;font-weight:700;background:#1f1f25;border:1px solid var(--line2);color:#c9c9d1}
+.tag.p{background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.4);color:var(--acc3)}
+.tag.r{background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.4);color:var(--red2)}
+.tag.g{background:rgba(34,197,94,.10);border-color:rgba(34,197,94,.4);color:var(--green)}
+.tag.c{background:rgba(56,189,248,.10);border-color:rgba(56,189,248,.4);color:var(--cyan)}
+.crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
+.crumbs span{background:#0f0f12;border:1px solid var(--line2);border-radius:9px;padding:4px 10px;font-size:15px;color:var(--num);font-weight:600}
+.crumbs i{font-style:normal;color:var(--acc2);font-weight:800}
+.stmt{font-size:44px;line-height:1.15;font-weight:800;letter-spacing:-.03em;color:var(--num);max-width:1000px}
+.stmt em{font-style:normal;background:linear-gradient(90deg,#a78bfa,#38bdf8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bignum{font-size:84px;font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--num);font-variant-numeric:tabular-nums}
+.bignum small{font-size:28px;color:var(--mut);margin-left:6px;font-weight:700}
+.glowc{box-shadow:0 0 0 1px rgba(139,92,246,.35),0 0 40px -6px rgba(139,92,246,.45)}
+/* платформы */
+.plat{display:flex;flex-direction:column;gap:6px}
+.plat .pn{font-size:22px;font-weight:800;color:var(--num);letter-spacing:-.02em}
+.plat.no{border-color:rgba(239,68,68,.4);background:linear-gradient(180deg,rgba(239,68,68,.08),rgba(239,68,68,.01)),var(--card)}
+.plat .st{display:inline-flex;align-self:flex-start;gap:6px;align-items:center;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:8px;padding:3px 9px;background:rgba(34,197,94,.12);color:var(--green)}
+.plat.no .st{background:rgba(239,68,68,.14);color:var(--red2)}
+/* слои OBS */
+.stack{display:flex;flex-direction:column;gap:8px}
+.layer{display:flex;align-items:center;gap:12px;background:#0f0f12;border:1px solid #2c2c33;border-radius:12px;padding:11px 14px;font-size:16px;color:var(--txt)}
+.layer .ey{margin-left:auto;color:var(--mut);font-size:14px;display:flex;gap:10px}
+.layer .k{flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--card3);color:var(--mut);font-size:13px;font-weight:800}
+.layer.cam{border-color:rgba(139,92,246,.6);background:rgba(139,92,246,.10)}
+.layer.cam .k{background:var(--acc);color:#fff}
+.slide.active .layer.cam{animation:glow 2.4s 1s infinite}
+.axis{display:flex;justify-content:space-between;color:var(--mut);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin:2px 4px}
+/* уровень звука */
+.db{position:relative;height:34px;border-radius:10px;overflow:hidden;display:grid;grid-template-columns:60fr 25fr 15fr;margin:14px 0 6px}
+.db div:nth-child(1){background:linear-gradient(90deg,#14532d,#22c55e)}
+.db div:nth-child(2){background:linear-gradient(90deg,#a16207,#facc15)}
+.db div:nth-child(3){background:linear-gradient(90deg,#b91c1c,#ef4444)}
+.db .tgt{position:absolute;top:-4px;bottom:-4px;left:var(--a);width:var(--w);border:3px solid #fff;border-radius:10px;box-shadow:0 0 18px rgba(255,255,255,.5)}
+.db .lvl{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(10,10,11,.0);border-right:3px solid #fff}
+.slide.active .db .lvl{animation:lvl 3s ease-in-out infinite alternate}
+@keyframes lvl{0%{width:40%}30%{width:58%}55%{width:52%}80%{width:62%}100%{width:48%}}
+.dbl{display:flex;justify-content:space-between;color:var(--mut);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+/* таблица площадок */
+.mx{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:16px}
+.mx th{color:var(--mut);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;text-align:left;padding:2px 14px}
+.mx td{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 14px;color:#d4d4d8;transition:.2s}
+.mx td:first-child{border-left:1px solid var(--line);border-radius:14px 0 0 14px;font-weight:800;color:var(--num);font-size:17px;white-space:nowrap}
+.mx td:last-child{border-right:1px solid var(--line);border-radius:0 14px 14px 0}
+.mx tr:hover td{background:var(--card2);border-color:rgba(139,92,246,.45)}
+.mx td a{color:var(--num);text-decoration:none}
+.mx td a::after{content:" →";color:var(--acc2)}
+/* вертикальный таймлайн */
+.vt{list-style:none;margin:0;padding:0 0 0 34px;position:relative;display:grid;gap:10px}
+.vt::before{content:"";position:absolute;left:14px;top:10px;bottom:10px;width:3px;border-radius:3px;background:linear-gradient(180deg,#7c3aed,#2e2e35)}
+.vt li{position:relative}
+.vt li::before{content:"";position:absolute;left:-27px;top:18px;width:13px;height:13px;border-radius:50%;background:var(--bg);border:3px solid var(--acc)}
+.vt li.key::before{background:var(--acc);box-shadow:0 0 12px var(--acc)}
+.vt li>div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.vt h4{margin:0;font-size:18px;color:var(--num)}.vt p{margin:4px 0 0;color:#c3c3cb;font-size:16px}
+.vt .t{color:var(--acc3);font-weight:800;font-variant-numeric:tabular-nums;margin-right:8px}
+/* лестница режимов */
+.modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:end}
+.mode{border-radius:14px;padding:14px 16px;border:1px solid rgba(139,92,246,.35);background:linear-gradient(180deg,rgba(139,92,246,var(--a)),rgba(139,92,246,.03))}
+.mode b{display:block;color:var(--num);font-size:18px}.mode span{color:#c9c9d1;font-size:15px}
+/* экран */
+.scr span small{display:block;font-weight:600;color:var(--mut);font-size:12px;margin-top:4px}
+/* меню площадки (мок) */
+.topbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#0f0f12;border:1px solid #2a2a31;border-radius:12px;padding:8px}
+.topbar span{padding:7px 12px;border-radius:9px;font-size:14px;font-weight:600;color:var(--mut)}
+.topbar span.on{background:var(--acc);color:#fff;box-shadow:0 4px 14px rgba(139,92,246,.4)}
+.topbar .me{margin-left:auto;background:var(--card2);color:var(--num)}
+/* CRM мок */
+.crm{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;background:#0f0f12;border:1px solid #2a2a31;border-radius:12px;padding:12px 14px;font-size:15px}
+.crm .play{width:34px;height:34px;border-radius:10px;background:rgba(34,197,94,.16);display:grid;place-items:center;color:var(--green);font-size:15px}
+.slide.active .crm .play{animation:glowg 2s 1s infinite}
+@keyframes glowg{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}50%{box-shadow:0 0 0 3px rgba(34,197,94,.5),0 0 18px rgba(34,197,94,.4)}}
+.crm .lock{border:1px dashed #4a4a55;border-radius:999px;padding:6px 14px;color:var(--mut);font-weight:700;font-size:14px;position:relative;white-space:nowrap}
+.crm .lock::after{content:"пока нет";position:absolute;right:-6px;top:-12px;background:var(--red);color:#fff;font-size:11px;border-radius:6px;padding:1px 6px}
+.chkgrid{grid-template-columns:auto 1fr;gap:28px;align-items:start}
+@media (max-width:1180px){.grid[style*="1.7fr"]{grid-template-columns:1fr!important}}
+/* калькулятор */
+.calc{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+.calc label{display:flex;flex-direction:column;gap:6px;color:var(--mut);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+.calc input{background:#0f0f12;border:1px solid var(--line2);border-radius:12px;color:var(--num);font:700 22px Inter,sans-serif;padding:8px 12px;width:150px;font-variant-numeric:tabular-nums;color-scheme:dark}
+.calc input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(139,92,246,.25)}
+.calc .res{font-size:44px;font-weight:800;color:var(--num);letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+.chk-msg{display:none;margin-top:12px;color:var(--green);font-weight:700}
+.chk-msg.ok{display:block}
+.dim{opacity:.25;filter:grayscale(1)}
+.fbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.fbar button{cursor:pointer;padding:7px 15px;border-radius:999px;border:1px solid var(--line2);background:var(--card);color:var(--mut);font-weight:600;font-size:14px;transition:.2s}
+.fbar button:hover{color:var(--txt)}
+.fbar button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+[data-tags]{transition:opacity .3s,filter .3s}
+.lessons{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.lessons a{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--card);color:var(--txt);text-decoration:none;font-size:14px;font-weight:600;transition:.2s}
+.lessons a:hover{border-color:var(--acc);color:var(--num)}
+.lessons a.on{border-color:var(--acc);background:rgba(139,92,246,.12);color:var(--acc3)}
+.lessons a b{color:var(--acc2)}
+.imgwrap.small img{max-width:620px}
+.quote{border-left:3px solid var(--acc);background:#0f0f12;border-radius:0 12px 12px 0;padding:12px 16px;color:#c9c9d1;font-size:15.5px}
+.quote b{color:var(--num)}
+@media (max-width:1180px){.hero h1{font-size:50px}.stmt{font-size:34px}.bignum{font-size:64px}.modes{grid-template-columns:1fr}}
+@media (max-width:640px){
+  html,body{font-size:16px}
+  .in{padding:22px 16px 26px}
+  .hero{min-height:auto}
+  .hero h1{font-size:38px}h2{font-size:27px}h3{font-size:19px}
+  .lead{font-size:17px}
+  .big{font-size:40px}.bignum{font-size:54px}.stmt{font-size:27px}
+  .card{padding:16px 16px}
+  .ctrl{padding:0 10px;gap:6px}
+  .ctrl .btn{padding:10px 13px}
+  #stepBtn{font-size:0;gap:0}#stepBtn::before{content:"▤";font-size:15px}
+  #fsBtn{display:none}
+  .edge{display:none}
+  .g3{grid-template-columns:1fr}
+  .mx thead{display:none}
+  .mx,.mx tbody,.mx tr,.mx td{display:block;width:100%}
+  .mx tr{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 4px;margin-bottom:10px}
+  .mx td,.mx td:first-child,.mx td:last-child{background:none;border:0;border-radius:0;padding:4px 12px}
+  .mx td[data-l]::before{content:attr(data-l);display:block;color:var(--mut);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+  .scr{grid-template-columns:1fr;min-height:0}
+  .crm{grid-template-columns:auto 1fr;}
+  .db{height:28px}
+  .calc .res{font-size:36px}
+  .toc{width:86vw;margin-left:-86vw}
+  .chkgrid{grid-template-columns:1fr}
+  .co-group{grid-template-columns:1fr!important}
+  .grid[style*="grid-template-columns"]{grid-template-columns:1fr!important}
+  .grid [style*="grid-column"]{grid-column:auto!important}
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="toc" id="toc">
+  <div class="brand"><b><span class="dot"></span>MENSORRY</b><span>Урок 2 · Площадки</span></div>
+  <ol id="tocList"></ol>
+  <div class="keys"><kbd>←</kbd> <kbd>→</kbd> листать · <kbd>Home</kbd>/<kbd>End</kbd><br><kbd>S</kbd> пошагово · <kbd>M</kbd> меню · клик по скрину — увеличить</div>
+</aside>
+<main class="stage" id="stage">
+<div class="progress"><i id="prog"></i></div>
+<div class="edge l" id="edgeL">‹</div><div class="edge r" id="edgeR">›</div>
+<!-- 0 ТИТУЛ -->
+<section class="slide" id="start" data-t="Титул">
+<div class="in hero">
+  <div class="orb" style="width:520px;height:520px;background:#7c3aed;right:-120px;top:-80px"></div>
+  <div class="orb" style="width:360px;height:360px;background:#0ea5e9;left:30%;bottom:-160px;opacity:.25"></div>
+  <div class="kick rv"><em>Урок 2</em> Webcam Studio · методичка модели</div>
+  <h1 class="rv">Площадки:<br>полная навигация</h1>
+  <p class="lead rv">Где что лежит, как запустить эфир, какие боты и приложения.<br>Говорим от лица модели в эфире — не от техника.</p>
+  <div class="badge-row rv"><a class="pill" href="#cb-nav" style="text-decoration:none">Chaturbate</a><a class="pill" href="#sc-nav" style="text-decoration:none">Stripchat</a><a class="pill c" href="#lj-nav" style="text-decoration:none">LiveJasmin</a><a class="pill" href="#c4-nav" style="text-decoration:none">Cam4</a><a class="pill" href="#cs-nav" style="text-decoration:none">CamSoda</a><a class="pill g" href="#xl-nav" style="text-decoration:none">XloveCam</a></div>
+  <div class="grid g4">
+    <div class="card rv lift"><div class="lbl">Площадок</div><div class="big num" data-count="6">0</div><div class="mut">одна логика навигации</div></div>
+    <div class="card rv lift"><div class="lbl">Apps на Chaturbate</div><div class="big num"><span data-count="10">0</span><small>V2</small> + <span data-count="6">0</span><small>V1</small></div><div class="mut">одновременно в комнате</div></div>
+    <div class="card rv lift"><div class="lbl">Boost на Cam4</div><div class="big num"><span data-count="25">0</span><small>ток.</small></div><div class="mut">= 5 минут выше в каталоге</div></div>
+    <div class="card rv lift"><div class="lbl">Stories на Jasmin</div><div class="big num"><span data-count="50">0</span><small>/день</small></div><div class="mut">максимум, Free или Premium</div></div>
+  </div>
+  <div class="mt2 rv"><button class="btn pri" data-next>Начать урок →</button> <span class="mut" style="margin-left:12px">или нажмите <kbd>→</kbd></span></div>
+  <div class="lessons rv"><a href="../"><b>◆</b> Методичка Chaturbate</a><a href="../pravila/"><b>1</b> Правила и OBS</a><a class="on" href="../urok2/"><b>2</b> Площадки</a><a href="../urok3/"><b>3</b> План запуска</a></div>
+</div></section>
+
+<!-- 1 СВОДНАЯ -->
+<section class="slide" id="howto" data-t="Шесть площадок — одна логика">
+<div class="in">
+  <div class="kick rv"><em>01</em> Как читать</div>
+  <h2 class="rv">Шесть площадок — одна логика</h2>
+  <p class="lead rv">Наведите на строку — она подсветится. Клик по названию открывает разбор площадки.</p>
+  <table class="mx rv">
+    <thead><tr><th>Площадка</th><th>Как ты заходишь</th><th>Чем стримишь</th><th>Деньги в комнате</th><th>Боты / приложения</th></tr></thead>
+    <tbody>
+      <tr class="rv step"><td><a href="#cb-nav">Chaturbate</a></td><td data-l="Как ты заходишь">Broadcast Yourself</td><td data-l="Чем стримишь">Браузер или OBS</td><td data-l="Деньги в комнате">Токены, тип, приват</td><td data-l="Боты / приложения">Apps во вкладке Apps, Lovense</td></tr>
+      <tr class="rv step"><td><a href="#sc-nav">Stripchat</a></td><td data-l="Как ты заходишь">Start Broadcasting</td><td data-l="Чем стримишь">Браузер / OBS / Plasma</td><td data-l="Деньги в комнате">Токены, приват, колесо</td><td data-l="Боты / приложения">Extensions под окном эфира</td></tr>
+      <tr class="rv step"><td><a href="#lj-nav">LiveJasmin</a></td><td data-l="Как ты заходишь">Model Center → Go Online</td><td data-l="Чем стримишь">Приложение Jasmin, не OBS</td><td data-l="Деньги в комнате">Кредиты, фри / приват / VIP</td><td data-l="Боты / приложения">Своё приложение, Stories</td></tr>
+      <tr class="rv step"><td><a href="#c4-nav">Cam4</a></td><td data-l="Как ты заходишь">Start Broadcast</td><td data-l="Чем стримишь">WebRTC или OBS / C4 App</td><td data-l="Деньги в комнате">Токены, приват, буст</td><td data-l="Боты / приложения">ChatBots + Lovense SmartCam</td></tr>
+      <tr class="rv step"><td><a href="#cs-nav">CamSoda</a></td><td data-l="Как ты заходишь">Go Live</td><td data-l="Чем стримишь">WebRTC или OBS</td><td data-l="Деньги в комнате">Токены, тикет, цель</td><td data-l="Боты / приложения">Show Type → боты целей</td></tr>
+      <tr class="rv step"><td><a href="#xl-nav">XloveCam</a></td><td data-l="Как ты заходишь">Начать шоу</td><td data-l="Чем стримишь">Браузер HD</td><td data-l="Деньги в комнате">Бонусы, приват, Xclusive</td><td data-l="Боты / приложения">Live Actions, мало ботов</td></tr>
+    </tbody>
+  </table>
+</div></section>
+
+<!-- 2 CB НАВИГАЦИЯ -->
+<section class="slide" id="cb-nav" data-t="Chaturbate: где что">
+<div class="in">
+  <div class="kick rv"><em>02</em> Chaturbate · навигация</div>
+  <h2 class="rv">Chaturbate — где что у модели</h2>
+  <figure class="shot rv mt"><div class="shot-tag">Схема · верхнее меню</div>
+    <div class="topbar"><span class="on">Broadcast Yourself</span><span>Chat</span><span>Following</span><span>Discover</span><span class="me">ник ▾ · профиль · баланс · настройки</span></div></figure>
+  <div class="grid g3 mt2">
+    <div class="card accent rv step lift"><div class="numh"><span class="n">1</span><h3>Верхнее меню</h3></div><p>Broadcast Yourself — сердце смены. Рядом: Chat, Following, Discover. Ник справа — профиль, баланс, настройки.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">2</span><h3>Broadcast Yourself</h3></div><p>Превью камеры, тема комнаты (Room Subject), гео-блок, Start Broadcast. Ниже — OBS / External Encoder: сервер и ключ.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">3</span><h3>Вкладка Apps</h3></div><p>Каталог приложений комнаты. До 10 V2 и 6 V1 сразу. V2 живут между эфирами, настройки меняются на лету.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">4</span><h3>Профиль</h3></div><p>Био, фото, соцсети, расписание. Это витрина: зритель заходит сюда до чата.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">5</span><h3>Tip Preferences</h3></div><p>Минимальный тип, цвета ников по сумме, меню в био. Цвет ника = сколько человек уже кинул.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">6</span><h3>В комнате во время эфира</h3></div><p>Чат справа. Панель приложений под/рядом с видео. Список зала. Кнопка Stop Broadcast — только когда смена реально кончилась.</p></div>
+  </div>
+</div></section>
+
+<!-- 3 CB ЭФИР -->
+<section class="slide" id="cb-live" data-t="Chaturbate: эфир и боты">
+<div class="in">
+  <div class="kick rv"><em>03</em> Chaturbate · эфир и боты</div>
+  <h2 class="rv">Как ты выходишь в эфир и что включаешь</h2>
+  <div class="grid g2 mt" style="align-items:start">
+    <div>
+      <div class="lbl rv" style="margin-bottom:10px">Старт эфира</div>
+      <div class="steps">
+        <div class="stp rv step"><span class="n">1</span><div><p>Зайди под своим ником → Broadcast Yourself.</p></div></div>
+        <div class="stp rv step"><span class="n">2</span><div><p>Напиши тему комнаты: что сейчас происходит, не «hi guys».</p></div></div>
+        <div class="stp rv step"><span class="n">3</span><div><p>Браузерный эфир — только запасной. Рабочий путь: OBS / External Encoder, ключ скопировать в OBS.</p></div></div>
+        <div class="stp rv step"><span class="n">4</span><div><p>Проверь гео-блок, если студия его задаёт.</p></div></div>
+        <div class="stp rv step" style="border-color:rgba(139,92,246,.5)"><span class="n" style="background:var(--acc);color:#fff">5</span><div><p><b style="color:var(--num)">Start Broadcast</b> на сайте. Потом <b style="color:var(--num)">Start Streaming</b> в OBS. Порядок важен: сайт «ждёт» картинку.</p></div></div>
+        <div class="stp rv step"><span class="n">6</span><div><p>Сразу глянь панель Apps — боты должны быть зелёные/запущенные.</p></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="lbl rv" style="margin-bottom:10px">Что включаешь</div>
+      <div class="grid">
+        <div class="card accent rv step"><h3>Lovense</h3><p>Главное приложение. Тип крутит игрушку. Оверлей в OBS через Browser Source из Lovense Connect.</p></div>
+        <div class="card rv step"><h3>Tip Menu / Goal</h3><p>Меню и цель смены. Зритель видит цену, не спрашивает сто раз.</p></div>
+        <div class="card rv step"><h3>Welcome / Announce</h3><p>Приветствие вошедшим и периодические напоминания правил и меню.</p></div>
+        <div class="card rv step"><h3>Игры</h3><p>Колесо, слоты, кубик — за тип. Не больше 2–3 игр сразу, иначе каша.</p><div class="tagrow"><span class="tag r">максимум 2–3 игры</span></div></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 4 SC НАВИГАЦИЯ -->
+<section class="slide" id="sc-nav" data-t="Stripchat: комната модели">
+<div class="in">
+  <div class="kick rv"><em>04</em> Stripchat · навигация</div>
+  <h2 class="rv">Stripchat — комната модели</h2>
+  <div class="grid g3 mt">
+    <div class="card accent rv step lift"><div class="numh"><span class="n">1</span><h3>Start Broadcasting</h3></div><p>Главная кнопка. После неё — новости и правила, потом окно эфира.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">2</span><h3>Под видео</h3></div><p>Switch to External Broadcast Software — ключ и RTMP. Здесь же цена привата (меняется только офлайн).</p><div class="tagrow"><span class="tag r">цена привата — только офлайн</span></div></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">3</span><h3>Вкладка Extensions</h3></div><p>Библиотека ботов.</p><div class="crumbs"><span>Install</span><i>→</i><span>настроить</span><i>→</i><span>Save</span><i>→</i><span>тумблер вкл.</span></div><p class="mt">Выключить тумблером, удалить через шестерёнку.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">4</span><h3>Профиль</h3></div><p>Расписание эфиров, «Notify when online», фото, твиттер-автопост анонса.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">5</span><h3>Во время шоу</h3></div><p>Чат, список зала, приват, запись шоу (если включила). Корону King не игнорируй — бот благодарности как раз про него.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">6</span><h3>Мобилка</h3></div><p>Браузер WebRTC или приложение Plasma Streaming (качество 480–1080, фон.режим).</p></div>
+  </div>
+</div></section>
+
+<!-- 5 SC ЭФИР -->
+<section class="slide" id="sc-live" data-t="Stripchat: старт и боты">
+<div class="in">
+  <div class="kick rv"><em>05</em> Stripchat · эфир и Extensions</div>
+  <h2 class="rv">Старт и боты Stripchat</h2>
+  <div class="grid g4 mt">
+    <div class="card accent rv step"><div class="bignum" style="font-size:54px">1</div><h3 class="mt">Start Broadcasting</h3><p>Открой комнату. Разреши камеру, если браузер.</p></div>
+    <div class="card rv step"><div class="bignum" style="font-size:54px">2</div><h3 class="mt">External software</h3><p>Ключ (зелёный токен) и сервер — в OBS. Service = Stripchat.</p></div>
+    <div class="card rv step"><div class="bignum" style="font-size:54px">3</div><h3 class="mt">Сначала OBS</h3><p>Start Streaming в OBS, потом подтверждение эфира на сайте.</p></div>
+    <div class="card warn rv step"><div class="bignum" style="font-size:54px">4</div><h3 class="mt">Цена привата</h3><p>Ставится до эфира. В эфире уже не поменять.</p></div>
+  </div>
+  <div class="note rv mt"><span class="ni">!</span><div>Порядок на Stripchat обратный Chaturbate: <b>сначала OBS</b>, потом подтверждение на сайте.</div></div>
+  <div class="lbl rv mt2" style="margin-bottom:10px">Боты (Extensions)</div>
+  <div class="grid g5">
+    <div class="card rv step lift"><h3>Welcome Bot</h3><p>Пишет вошедшему правила / привет.</p></div>
+    <div class="card rv step lift"><h3>Tip Reaction</h3><p>Спасибо за тип и новому King.</p></div>
+    <div class="card rv step lift"><h3>Announcement</h3><p>Напоминание меню по таймеру.</p></div>
+    <div class="card rv step lift"><h3>Wheel of Fortune</h3><p>Колесо за тип — действие из списка.</p></div>
+    <div class="card rv step lift"><h3>Lovense</h3><p>Через расширение / Connect, как на CB.</p></div>
+  </div>
+</div></section>
+
+<!-- 6 JASMIN НАВИГАЦИЯ -->
+<section class="slide" id="lj-nav" data-t="LiveJasmin: Model Center">
+<div class="in">
+  <div class="kick rv"><em>06</em> LiveJasmin · навигация</div>
+  <h2 class="rv">Jasmin — Model Center, не браузерный «сайт как CB»</h2>
+  <p class="lead rv">На Jasmin ты почти всегда в официальном приложении (десктоп или телефон). OBS студия для Jasmin не использует.</p>
+  <div class="grid g3">
+    <div class="card accent rv step lift"><div class="numh"><span class="n">1</span><h3>Вход</h3></div><p>modelcenter.livejasmin.com или приложение из Model Center. Go Online Now — старт.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">2</span><h3>Профиль</h3></div><p>Фото, видео, био. Ник после апрува не меняется. Цены — Profile → Price &amp;amp; Privacy.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">3</span><h3>Режимы</h3></div><p>Free Chat — витрина. Member / Private — поминутная касса. VIP Show — цель + таймер 5–15 мин.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">4</span><h3>VIP Show</h3></div><p>До старта: название, описание, цель, минимальный вход, длительность. В прешоу настройки уже не трогать.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">5</span><h3>Stories</h3></div><p>Model Center → My Content → Stories. Free или Premium. До 50 сторис в день.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">6</span><h3>Напарница</h3></div><p>Второй человек в кадре — тоже верифицированная модель Jasmin.</p></div>
+  </div>
+  <div class="modes mt rv">
+    <div class="mode" style="--a:.10"><b>Free Chat</b><span>витрина</span></div>
+    <div class="mode" style="--a:.22"><b>Member / Private</b><span>поминутная касса</span></div>
+    <div class="mode" style="--a:.38"><b>VIP Show</b><span>цель + таймер 5–15 мин</span></div>
+  </div>
+</div></section>
+
+<!-- 7 JASMIN КАК ВЕСТИ -->
+<section class="slide" id="lj-live" data-t="LiveJasmin: как вести">
+<div class="in">
+  <div class="kick rv"><em>07</em> LiveJasmin · как вести</div>
+  <h2 class="rv">Как модель ведёт Jasmin</h2>
+  <div class="grid g3 mt">
+    <div class="card rv step lift"><div class="numh"><span class="n">01</span><h3>Открыть приложение</h3></div><p>Не сайт в Chrome. Проверь свет и звук внутри приложения.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">02</span><h3>Выйти в Free</h3></div><p>Фри — не шоу «всё сразу». Это витрина, отсюда забирают в приват.</p></div>
+    <div class="card warn rv step lift"><div class="numh"><span class="n">03</span><h3>Не сливать контент</h3></div><p>В фри держи интригу. Откровенное — в приват и VIP. Иначе касса падает.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">04</span><h3>Приват</h3></div><p>Поминутный режим. Смотри таймер и сообщения. Не молчи первые 20 секунд.</p><div class="tagrow"><span class="tag p">первые 20 секунд — говори</span></div></div>
+    <div class="card accent rv step lift"><div class="numh"><span class="n">05</span><h3>VIP</h3></div><div class="crumbs"><span>Анонс</span><i>→</i><span>прешоу (сбор)</span><i>→</i><span>шоу</span></div><p class="mt">Если цель не собрана, но кредиты есть — можно стартовать вручную.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">06</span><h3>После</h3></div><p>Сторис, ответ на сообщения в центре. Не оставляй «онлайн» пустым окном.</p></div>
+  </div>
+</div></section>
+
+<!-- 8 CAM4 НАВИГАЦИЯ -->
+<section class="slide" id="c4-nav" data-t="Cam4: окно эфира">
+<div class="in">
+  <div class="kick rv"><em>08</em> Cam4 · навигация и эфир</div>
+  <h2 class="rv">Cam4 — окно эфира и шестерёнка</h2>
+  <div class="grid mt" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr);align-items:start">
+    <div class="grid g2">
+      <div class="card accent rv step lift"><div class="numh"><span class="n">1</span><h3>Старт</h3></div><p>Start Broadcast в верхнем меню. Окно эфира: статус/тема над превью, тип шоу (Solo / Group), Start Broadcast.</p></div>
+      <div class="card rv step lift"><div class="numh"><span class="n">2</span><h3>Два пути картинки</h3></div><p>Regular / WebRTC — камера из браузера. OBS External Encoder — ключ в Broadcast Settings. Virtual Camera — только если мультистрим.</p></div>
+      <div class="card rv step lift"><div class="numh"><span class="n">3</span><h3>Шестерёнка чата</h3></div><p>Справа сверху в окне эфира. Платные ЛС, размер шрифта, кто может писать (все / язык / друзья / покупатели токенов).</p></div>
+      <div class="card rv step lift"><div class="numh"><span class="n">5</span><h3>C4 Broadcaster</h3></div><p>Официальное приложение (Android / зеркало на Windows). Там же игры: кубик, колесо, кено.</p></div>
+      <div class="card rv step lift" style="grid-column:1/-1"><div class="numh"><span class="n">6</span><h3>ChatBots</h3></div><p>Welcome (раз в 2 часа на человека, только ему). Tip Response — до 6 порогов. Auto Notification — ротация.</p></div>
+    </div>
+    <div class="card accent rv step glowc" style="text-align:center"><div class="numh" style="justify-content:center"><span class="n">4</span><h3>Boost</h3></div>
+      <div class="bignum mt"><span data-count="25">0</span><small>ток.</small></div><div class="lbl mt" style="font-size:20px;color:var(--acc3)">=</div><div class="bignum"><span data-count="5">0</span><small>мин</small></div>
+      <p class="mt">выше в каталоге. Имеет смысл в начале смены или после провала зала.</p></div>
+  </div>
+</div></section>
+
+<!-- 9 CAM4 БОТЫ -->
+<section class="slide" id="c4-bots" data-t="Cam4: боты и Lovense">
+<div class="in">
+  <div class="kick rv"><em>09</em> Cam4 · боты и Lovense</div>
+  <h2 class="rv">Что модель включает на Cam4</h2>
+  <div class="grid g3 mt">
+    <div class="card rv step lift"><h3>Welcome</h3><p>Пишет только вошедшему, не спамит зал. Плейсхолдер <code>{user}</code>.</p></div>
+    <div class="card rv step lift"><h3>Tip Response</h3><p>До шести сумм — разные ответы. Спасибо должно звучать как ты, не как робот.</p><div class="tagrow"><span class="tag p">до 6 порогов</span></div></div>
+    <div class="card rv step lift"><h3>Auto Notification</h3><p>Меню и правила по кругу. Не чаще, чем зал успевает прочитать.</p></div>
+    <div class="card accent rv step lift"><h3>Lovense SmartCam</h3><p>Меню поверх картинки. Внутри — кинг, топ тип, автоответ. Ставится через Lovense.</p></div>
+    <div class="card rv step lift"><h3>Игры в C4 App</h3><p>Кубик, колесо, кено — в мобильном/приложении вещания.</p></div>
+    <div class="card rv step lift"><h3>Fan Club / ЛС</h3><p>Можно брать токены за сообщения. Подписчикам — дешевле или бесплатно.</p></div>
+  </div>
+</div></section>
+
+<!-- 10 CAMSODA НАВИГАЦИЯ -->
+<section class="slide" id="cs-nav" data-t="CamSoda: Go Live и Show Type">
+<div class="in">
+  <div class="kick rv"><em>10</em> CamSoda · навигация</div>
+  <h2 class="rv">CamSoda — Go Live и Show Type</h2>
+  <div class="grid g3 mt">
+    <div class="card accent rv step lift"><div class="numh"><span class="n">1</span><h3>Вход в эфир</h3></div><p>Go Live с главной или из меню профиля. На мобилке — меню слева сверху → Go Live.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">2</span><h3>Окно до старта</h3></div><p>Камера / микрофон / разрешение / Cam2Cam вкл-выкл. Тип: Solo или Couple/Group. Зелёная Start Stream.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">3</span><h3>OBS</h3></div><p>Use OBS Broadcaster под окном (если студия включила). Сервер + ключ → OBS Custom.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">4</span><h3>Тема и боты</h3></div><p>Рядом с темой — синяя Show Type. Отсюда цели, тикет, Lovense, кубик.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">5</span><h3>Во время эфира</h3></div><p>Скидка на приват, Manage PMs, Snap, raffle. Сетка доп. функций — друг, запись, соцсети.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">6</span><h3>Пара</h3></div><p>Settings &amp;amp; Privacy → Allow streaming partner invites. Оба должны быть верифицированы.</p></div>
+  </div>
+</div></section>
+
+<!-- 11 CAMSODA БОТЫ -->
+<section class="slide" id="cs-bots" data-t="CamSoda: боты Show Type">
+<div class="in">
+  <div class="kick rv"><em>11</em> CamSoda · боты Show Type</div>
+  <h2 class="rv">Какой бот для какой сцены</h2>
+  <div class="grid g3 mt">
+    <div class="card rv step lift"><div class="ico">◎</div><h3>Tip Goal</h3><p>Одна большая цель. Дошла полоска — выполняешь обещание.</p><div class="meter mt"><i style="--w:100%"></i></div></div>
+    <div class="card rv step lift"><div class="ico">↻</div><h3>Auto-Reset Goal</h3><p>Маленькая цель по кругу: слой одежды, поза, повтор.</p><div class="meter mt"><i style="--w:35%"></i></div></div>
+    <div class="card rv step lift"><div class="ico">⋯</div><h3>Multi-Goal</h3><p>Цепочка целей одна за другой. Сценарий смены.</p><div class="meter mt"><i style="--w:66%"></i></div></div>
+    <div class="card rv step lift"><div class="ico">✦</div><h3>Golden Ticket</h3><p>Билет на шоу + таймер. Кто купил — смотрит закрытое.</p></div>
+    <div class="card rv step lift"><div class="ico">▥</div><h3>Fill the Tank</h3><p>«Бак» под вибратор. Наполнили — работает, опустел — новый круг.</p></div>
+    <div class="card warn rv step lift"><div class="ico">⚄</div><h3>Lovense / Dice</h3><p>Игрушка и кубик. Не включай всё сразу — зал теряется.</p></div>
+  </div>
+</div></section>
+
+<!-- 12 XLOVE НАВИГАЦИЯ -->
+<section class="slide" id="xl-nav" data-t="XloveCam: кабинет модели">
+<div class="in">
+  <div class="kick rv"><em>12</em> XloveCam · навигация</div>
+  <h2 class="rv">XloveCam — шоу из кабинета модели</h2>
+  <div class="grid g3 mt">
+    <div class="card accent rv step lift"><div class="numh"><span class="n">1</span><h3>Главная модели</h3></div><p>Кнопка «Начать шоу», вкладки Шоу и Заработки, карточка модели (портфолио, инфо).</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">2</span><h3>Перед стартом</h3></div><p>Разрешить камеру и микрофон. Settings HD — устройство и разрешение. Save → Start your show.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">3</span><h3>Free Chat</h3></div><p>Основной онлайн. Отсюда забирают в приват. Есть Loves — сердечки, не деньги, но греют зал.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">4</span><h3>Private</h3></div><p>Поминутно. В привате до 4 зрителей; cam2cam включает тот, кто открыл приват.</p><div class="tagrow"><span class="tag p">до 4 зрителей</span></div></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">5</span><h3>Xclusive</h3></div><p>Более закрытый режим. Cam2cam и двусторонний звук обычно уже внутри.</p></div>
+    <div class="card rv step lift"><div class="numh"><span class="n">6</span><h3>Live Actions</h3></div><p>Готовое меню действий на сайте (поцелуй, топлесс, каблуки…). Это и есть «бот меню» площадки.</p></div>
+  </div>
+  <div class="modes mt rv">
+    <div class="mode" style="--a:.10"><b>Free Chat</b><span>основной онлайн</span></div>
+    <div class="mode" style="--a:.22"><b>Private</b><span>поминутно, до 4 зрителей</span></div>
+    <div class="mode" style="--a:.38"><b>Xclusive</b><span>только вы двое</span></div>
+  </div>
+</div></section>
+
+<!-- 13 XLOVE КАК ВЕСТИ -->
+<section class="slide" id="xl-live" data-t="XloveCam: что делать">
+<div class="in">
+  <div class="kick rv"><em>13</em> XloveCam · как вести</div>
+  <h2 class="rv">Что делать модели на Xlove</h2>
+  <div class="grid g2 mt" style="align-items:start">
+    <div class="steps">
+      <div class="stp rv step"><span class="n">1</span><div><h3>Начать шоу → HD Settings → Start</h3><p>Проверь, что в кадре то устройство, которое нужно, не встроенная камера ноутбука.</p></div></div>
+      <div class="stp rv step"><span class="n">2</span><div><h3>Живи в Free</h3><p>Пиши в чат, жми Live Actions как меню. Бонусы = чаевые площадки.</p></div></div>
+      <div class="stp rv step"><span class="n">3</span><div><h3>Зови в Private</h3><p>Цена видна у кнопки входа. Не торгуйся в чате ниже студийного прайса.</p></div></div>
+    </div>
+    <div class="steps">
+      <div class="stp rv step"><span class="n">4</span><div><h3>Cam2cam</h3><p>В привате появятся иконки камеры и микрофона. Включает гость. На телефоне камера+звук вместе, Android — Chrome.</p></div></div>
+      <div class="stp rv step"><span class="n">5</span><div><h3>Xclusive</h3><p>Когда гость хочет «только вы двое» и картинку на себя. Дороже, спокойнее, меньше зрителей.</p></div></div>
+      <div class="stp rv step"><span class="n">6</span><div><h3>Боты</h3><p>Отдельного магазина как на CB почти нет. Рабочие инструменты: Live Actions, бонусы, VIP, оферты студии.</p></div></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 14 СВОДКА ПРИЛОЖЕНИЙ -->
+<section class="slide" id="apps" data-t="Сводка: что держать запущенным">
+<div class="in fgroup">
+  <div class="kick rv"><em>14</em> Сводка · приложения</div>
+  <h2 class="rv">Что держать запущенным</h2>
+  <p class="lead rv">Выберите площадку — останутся приложения, которые для неё нужны.</p>
+  <div class="fbar rv"><button data-filter="all" class="on">Все</button><button data-filter="cb">Chaturbate</button><button data-filter="sc">Stripchat</button><button data-filter="lj">LiveJasmin</button><button data-filter="c4">Cam4</button><button data-filter="cs">CamSoda</button><button data-filter="f4f">Flirt4Free</button></div>
+  <div class="grid g3">
+    <div class="card accent rv step lift" data-tags="cb sc c4 cs f4f"><h3>OBS</h3><p>CB, Stripchat, Cam4, CamSoda, Flirt. Не Jasmin.</p><div class="tagrow"><span class="tag p">CB</span><span class="tag p">Stripchat</span><span class="tag p">Cam4</span><span class="tag p">CamSoda</span><span class="tag p">Flirt</span><span class="tag r">✕ Jasmin</span></div></div>
+    <div class="card rv step lift" data-tags="lj"><h3>Jasmin App</h3><p>Только LiveJasmin. Десктоп + телефон.</p><div class="tagrow"><span class="tag c">LiveJasmin</span></div></div>
+    <div class="card rv step lift" data-tags="cb sc c4 cs"><h3>Lovense Connect</h3><p>CB, Strip, Cam4, CamSoda. Оверлей в OBS.</p><div class="tagrow"><span class="tag p">CB</span><span class="tag p">Strip</span><span class="tag p">Cam4</span><span class="tag p">CamSoda</span></div></div>
+    <div class="card rv step lift" data-tags="cb sc c4 cs lj f4f"><h3>Logi / Snap</h3><p>Сплиттер камеры на несколько сайтов.</p><div class="tagrow"><span class="tag g">несколько сайтов</span></div></div>
+    <div class="card rv step lift" data-tags="c4"><h3>C4 Broadcaster</h3><p>Мобильный/зеркальный эфир Cam4 + игры.</p><div class="tagrow"><span class="tag p">Cam4</span></div></div>
+    <div class="card rv step lift" data-tags="sc"><h3>Plasma</h3><p>Мобильный внешний эфир Stripchat.</p><div class="tagrow"><span class="tag p">Stripchat</span></div></div>
+  </div>
+</div></section>
+
+<!-- 15 ЧЕКЛИСТ -->
+<section class="slide" id="check" data-t="Чеклист модели">
+<div class="in">
+  <div class="kick rv"><em>15</em> Чеклист модели</div>
+  <h2 class="rv">Перед тем как моргнуть в камеру</h2>
+  <div class="grid chkbox chkgrid mt">
+    <div class="card rv" style="text-align:center">
+      <div class="ring"><svg width="150" height="150"><defs><linearGradient id="rg" x1="0" x2="1"><stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs><circle class="bgc" cx="75" cy="75" r="62"/><circle class="fgc" cx="75" cy="75" r="62" stroke-dasharray="389.6" stroke-dashoffset="389.6"/></svg><div><div><b class="num ringn">0</b><span class="ringt">из 0</span></div></div></div>
+      <div class="chk-msg">Готова к эфиру ✓</div>
+      <div class="mut mt" style="font-size:15px">Отметки сохраняются<br>в этом браузере</div>
+      <button class="btn mt chkReset">Сбросить</button></div>
+    <div>
+      <ul class="chk">
+        <li class="rv step"><span><b>1.</b> Ник и пароль той площадки, с которой стартуешь — не чужой вкладки.</span></li>
+        <li class="rv step"><span><b>2.</b> Тема комнаты написана живым языком, меню на месте.</span></li>
+        <li class="rv step"><span><b>3.</b> Нужные боты включены: привет, тип, цель / колесо. Лишнее выключено.</span></li>
+        <li class="rv step"><span><b>4.</b> Lovense видит игрушку. На Jasmin приложение открыто, не браузер.</span></li>
+        <li class="rv step"><span><b>5.</b> Приватная цена — студийная. На Stripchat её уже не сменить в эфире.</span></li>
+        <li class="rv step"><span><b>6.</b> В чате ты, не только бот. Первые ники называешь вслух.</span></li>
+      </ul>
+      <div class="lessons rv"><a href="../pravila/"><b>←</b> Урок 1 · Правила и OBS</a><a href="../urok3/"><b>→</b> Урок 3 · План запуска</a></div>
+    </div>
+  </div>
+</div></section>
+
+<nav class="ctrl">
+  <button class="btn menu-btn" id="menuBtn">☰</button>
+  <button class="btn" id="prev">← Назад</button>
+  <span class="count num"><b id="cur">1</b> / <span id="tot">1</span></span>
+  <button class="btn pri" id="next">Далее →</button>
+  <span class="cur" id="curT"></span>
+  <span class="sp"></span>
+  <button class="btn" id="stepBtn" title="Пошаговый показ (S)">▤ Пошагово</button>
+  <button class="btn" id="fsBtn" title="На весь экран">⛶</button>
+</nav>
+</main>
+</div>
+<div id="lb"><span>Esc — закрыть</span><img alt=""></div>
+<script>
+var CHK_KEY="mensorry_urok2_checks";
+(function(){
+var $=function(s,r){return (r||document).querySelector(s)}, $$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
+var Q=new URLSearchParams(location.search);
+if(Q.has('static'))document.documentElement.classList.add('static');
+var slides=$$('.slide'), cur=-1, stepMode=false, timers=[];
+var ol=$('#tocList');
+slides.forEach(function(s,i){
+  var k=$('.kick em',s); if(k&&i>0) k.textContent=(i<10?'0':'')+i;
+  $$('.rv',s).forEach(function(e,j){e.style.setProperty('--i',Math.min(j,18));});
+  var li=document.createElement('li'); li.innerHTML='<a href="#'+s.id+'"><i>'+(i===0?'★':i)+'</i><span>'+s.dataset.t+'</span></a>'; ol.appendChild(li);
+});
+$('#tot').textContent=slides.length;
+function runCounters(s){$$('[data-count]',s).forEach(function(el){var to=+el.dataset.count,t0=null,d=1100;
+  if(Q.has('static')){el.textContent=to.toLocaleString('ru-RU');return;}
+  function f(t){if(!t0)t0=t;var k=Math.min(1,(t-t0)/d),e=1-Math.pow(1-k,3);el.textContent=Math.round(to*e).toLocaleString('ru-RU');if(k<1)requestAnimationFrame(f);}
+  el.textContent='0';setTimeout(function(){requestAnimationFrame(f)},250);});}
+function hl(g,n){$$('[data-n]',g).forEach(function(e){if(e.classList.contains('slide'))return;e.classList.toggle('hl',e.dataset.n==n);});}
+function runCallouts(s){timers.forEach(clearInterval);timers=[];
+  $$('.co-group',s).forEach(function(g){var ns=$$('.callouts li[data-n]',g).map(function(l){return l.dataset.n;});if(!ns.length)return;
+    var i=0,paused=false;hl(g,ns[0]);
+    $$('.callouts li',g).forEach(function(l){l.onmouseenter=function(){paused=true;hl(g,l.dataset.n)};l.onmouseleave=function(){paused=false};l.onclick=function(){paused=true;hl(g,l.dataset.n)};});
+    timers.push(setInterval(function(){if(paused)return;i=(i+1)%ns.length;hl(g,ns[i]);},2600));});}
+function go(n){
+  n=Math.max(0,Math.min(slides.length-1,n)); if(n===cur)return;
+  var prev=slides[cur]; if(prev){prev.classList.remove('active');prev.classList.toggle('back',n>cur);}
+  var s=slides[n]; s.classList.remove('back'); s.scrollTop=0;
+  $$('.rv',s).forEach(function(e){e.classList.remove('now','hold')});
+  if(stepMode) $$('.step',s).forEach(function(e){e.classList.add('hold')});
+  void s.offsetWidth; s.classList.add('active'); cur=n;
+  $('#prog').style.width=((n+1)/slides.length*100)+'%';
+  $('#cur').textContent=n+1; $('#curT').textContent=s.dataset.t;
+  $$('#tocList a').forEach(function(a,i){a.classList.toggle('on',i===n);if(i===n){a.classList.add('seen');var li=a.parentNode;ol.scrollTop=Math.max(0,li.offsetTop-ol.clientHeight/2);}});
+  if(location.hash!=='#'+s.id) history.replaceState(null,'','#'+s.id);
+  runCounters(s); runCallouts(s);
+  [$('.app'),$('#stage'),document.documentElement,document.body].forEach(function(x){if(x)x.scrollLeft=0;});
+  document.body.classList.remove('toc-open');
+}
+function next(){var h=$('.step.hold',slides[cur]); if(stepMode&&h){h.classList.remove('hold');h.classList.add('now');var r=h.getBoundingClientRect();if(r.bottom>innerHeight-80)h.scrollIntoView({behavior:'smooth',block:'center'});return;} go(cur+1);}
+function prev(){go(cur-1);}
+$('#next').onclick=next; $('#prev').onclick=prev; $('#edgeR').onclick=next; $('#edgeL').onclick=prev;
+$$('[data-next]').forEach(function(b){b.onclick=function(){go(cur+1)}});
+document.addEventListener('click',function(e){var a=e.target.closest('a[href^="#"]');if(!a)return;var id=a.getAttribute('href').slice(1),i=slides.findIndex(function(s){return s.id===id});if(i>=0){e.preventDefault();go(i);}});
+document.addEventListener('keydown',function(e){
+  if($('#lb').classList.contains('on')){if(e.key==='Escape')$('#lb').classList.remove('on');return;}
+  if(e.target.closest('input,textarea,select'))return;
+  if(['ArrowRight','PageDown',' '].indexOf(e.key)>=0){e.preventDefault();next();}
+  else if(['ArrowLeft','PageUp'].indexOf(e.key)>=0){e.preventDefault();prev();}
+  else if(e.key==='Home')go(0); else if(e.key==='End')go(slides.length-1);
+  else if(e.key==='s'||e.key==='S'||e.key==='ы'||e.key==='Ы')toggleStep();
+  else if(e.key==='m'||e.key==='M'||e.key==='ь'||e.key==='Ь')document.body.classList.toggle('toc-open');
+});
+var tx=null,ty=null;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+document.addEventListener('touchend',function(e){if(tx===null)return;var dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5&&!e.target.closest('.xscroll'))(dx<0?next:prev)();tx=null;});
+function toggleStep(){stepMode=!stepMode;$('#stepBtn').classList.toggle('on',stepMode);var s=slides[cur];$$('.step',s).forEach(function(e){e.classList.toggle('hold',stepMode);e.classList.remove('now')});}
+$('#stepBtn').onclick=toggleStep;
+$('#menuBtn').onclick=function(){document.body.classList.toggle('toc-open')};
+$('#fsBtn').onclick=function(){if(document.fullscreenElement)document.exitFullscreen();else if(document.documentElement.requestFullscreen)document.documentElement.requestFullscreen();};
+window.addEventListener('hashchange',function(){var i=slides.findIndex(function(s){return '#'+s.id===location.hash});if(i>=0){go(i);[$('.app'),$('#stage')].forEach(function(x){x.scrollLeft=0;x.scrollTop=0;});}});
+document.addEventListener('click',function(e){var im=e.target.closest('.imgwrap img');if(!im)return;var lb=$('#lb');$('img',lb).src=im.src;lb.classList.add('on');});
+$('#lb').onclick=function(){this.classList.remove('on')};
+// копирование
+$$('.cpb').forEach(function(b){b.onclick=function(){var t=b.closest('.cpy').querySelector('pre').innerText,ok=function(){b.textContent='Скопировано ✓';setTimeout(function(){b.textContent='Копировать'},1500)};function fb(){var x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();try{document.execCommand('copy')}catch(e){}x.remove();ok();}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb();}});
+// чек-листы
+var saved={}; try{saved=JSON.parse(localStorage.getItem(CHK_KEY)||'{}')}catch(e){}
+var all=$$('.chk li');
+all.forEach(function(li,i){if(saved[i])li.classList.add('done');li.onclick=function(){li.classList.toggle('done');saved[i]=li.classList.contains('done');try{localStorage.setItem(CHK_KEY,JSON.stringify(saved))}catch(e){};upd();};});
+function upd(){$$('.chkbox').forEach(function(b){var l=$$('.chk li',b),d=l.filter(function(x){return x.classList.contains('done')}).length;
+  var n=$('.ringn',b),t=$('.ringt',b),c=$('.fgc',b);if(n)n.textContent=d;if(t)t.textContent='из '+l.length;if(c)c.style.strokeDashoffset=389.6*(1-(l.length?d/l.length:0));
+  var m=$('.chk-msg',b);if(m)m.classList.toggle('ok',d===l.length&&l.length>0);});}
+$$('.chkReset').forEach(function(btn){btn.onclick=function(){saved={};try{localStorage.removeItem(CHK_KEY)}catch(e){};all.forEach(function(l){l.classList.remove('done')});upd();};});
+upd();
+// раскрывашки / фильтры
+$$('[data-filter]').forEach(function(b){b.onclick=function(){var g=b.closest('.fgroup'),v=b.dataset.filter;$$('[data-filter]',g).forEach(function(x){x.classList.toggle('on',x===b)});
+  $$('[data-tags]',g).forEach(function(c){c.classList.toggle('dim',v!=='all'&&c.dataset.tags.split(' ').indexOf(v)<0)});};});
+if(window.deckInit)window.deckInit($,$$);
+var start=slides.findIndex(function(s){return '#'+s.id===location.hash}); go(start>=0?start:0);
+})();
+
+</script>
+</body>
+</html>
