@@ -1,2 +1,2 @@
-# ganich2189-glitch.github.io
+# mensorry.github.io
 MENSORRY guide
