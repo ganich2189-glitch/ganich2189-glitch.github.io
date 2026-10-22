@@ -576,8 +576,8 @@ pre.code .tg{color:#f472b6}pre.code .at{color:#7dd3fc}pre.code .ph{background:rg
   <h2 class="rv">OBS — программа для прямых трансляций</h2>
   <p class="lead rv">Мы используем OBS только для Chaturbate, StripChat, Cam4 и Flirt4Free. Jasmin запускается через своё приложение.</p>
   <div class="grid g5">
-    <div class="card plat rv step lift"><span class="st">● OBS</span><div class="pn">Chaturbate</div><p>OBS. Основной вывод, Full HD.</p></div>
-    <div class="card plat rv step lift"><span class="st">● OBS</span><div class="pn">StripChat</div><p>OBS. Можно как основной, если нет CB.</p></div>
+    <div class="card plat rv step lift"><span class="st">● OBS</span><div class="pn">Chaturbate</div><p>OBS. Дополнительный вывод через «Множественный вывод», Full HD.</p></div>
+    <div class="card plat rv step lift"><span class="st">● OBS</span><div class="pn">StripChat</div><p>OBS. Основной вывод.</p></div>
     <div class="card plat rv step lift"><span class="st">● OBS</span><div class="pn">Cam4</div><p>OBS. Часто берёт настройки StripChat.</p></div>
     <div class="card plat rv step lift"><span class="st">● OBS</span><div class="pn">Flirt4Free</div><p>OBS.</p></div>
     <div class="card plat no rv step lift"><span class="st">✕ не OBS</span><div class="pn">Jasmin</div><p>Не OBS — своё приложение.</p></div>
@@ -665,14 +665,14 @@ pre.code .tg{color:#f472b6}pre.code .at{color:#7dd3fc}pre.code .ph{background:rg
     <div class="card accent rv glowc">
       <div class="lbl" style="color:var(--acc3)">Chaturbate</div>
       <div class="big num"><span data-count="7000">0</span>–<span data-count="15000">0</span><small>кбит/с</small></div>
-      <div class="tagrow"><span class="tag p">Full HD</span><span class="tag p">NVIDIA → NVENC</span><span class="tag p">основной вывод</span></div>
-      <ul class="list mt"><li>Full HD. Битрейт 7000–15000 — крутим по нагрузке трансляции. То же с параметром «Профиль».</li><li>Кодировщик: NVIDIA → NVENC. AMD RX550 и младше — снизить нагрузку или число потоков.</li><li>Выводим через основной вывод, не через мультивывод.</li><li>Сервер — ближайший локально. Автовыбор часто врёт.</li></ul>
+      <div class="tagrow"><span class="tag p">Full HD</span><span class="tag p">NVIDIA → NVENC</span><span class="tag p">мультивывод</span></div>
+      <ul class="list mt"><li>Full HD. Битрейт 7000–15000 — крутим по нагрузке трансляции. То же с параметром «Профиль».</li><li>Кодировщик: NVIDIA → NVENC. AMD RX550 и младше — снизить нагрузку или число потоков.</li><li>Выводим через «Множественный вывод»: ключ и сервер с сайта.</li><li>Сервер — ближайший локально. Автовыбор часто врёт.</li></ul>
     </div>
     <div class="card rv">
       <div class="lbl" style="color:var(--cyan)">StripChat · Cam4</div>
       <div class="big num"><span data-count="2500">0</span>–<span data-count="5000">0</span><small>кбит/с</small></div>
-      <div class="tagrow"><span class="tag c">Full HD можно</span><span class="tag c">ключ + сервер с сайта</span></div>
-      <ul class="list mt"><li>Разрешение можно оставить Full HD. Сверяем со скринами.</li><li>Битрейт 2500–5000. Регулируем по нагрузке, как и «Профиль».</li><li>Если основной сайт не Chaturbate, а StripChat — его настройки можно брать для Cam4.</li><li>Тогда в выводе остаются ключ и сервер с самого сайта.</li></ul>
+      <div class="tagrow"><span class="tag c">Full HD можно</span><span class="tag c">основной вывод</span></div>
+      <ul class="list mt"><li>Разрешение можно оставить Full HD. Сверяем со скринами.</li><li>Битрейт 2500–5000. Регулируем по нагрузке, как и «Профиль».</li><li>StripChat — основной вывод: ключ и сервер Stripchat вставляем в «Настройки → Вещание».</li><li>Его же настройки можно брать для Cam4 в мультивыводе.</li></ul>
     </div>
   </div>
 </div></section>
@@ -691,13 +691,13 @@ pre.code .tg{color:#f472b6}pre.code .at{color:#7dd3fc}pre.code .ph{background:rg
           <i class="hot r" data-n="3" style="--l:68.4%;--t:86.4%;--w:31%;--h:6.5%;--p:2"></i>
           <span class="zoom-hint">⤢ увеличить</span></div>
         <figcaption>Личные данные на скриншоте скрыты (размытая полоса).</figcaption></figure>
-      <div class="quote rv mt"><b>Подробно со скриншота:</b> в «Настройках» OBS выбрать один сайт основным — по умолчанию CHATURBATE. При добавлении «вывода» в множественном выводе в пункте «Кодировщик» по умолчанию стоит «Взять с OBS»: настройки трансляции берутся с основных настроек, которые вы указали для CHATURBATE. Если основной не CHATURBATE, а Stripchat — можно использовать его настройки для CAM4; тогда в выводе к этим сайтам остаётся вставить «ключ» и «сервер», которые берём с сайта.</div>
+      <div class="quote rv mt"><b>Подробно со скриншота:</b> в «Настройках» OBS выбрать один сайт основным — у нас это STRIPCHAT. При добавлении «вывода» в множественном выводе в пункте «Кодировщик» по умолчанию стоит «Взять с OBS»: настройки трансляции берутся с основных настроек, которые вы указали для STRIPCHAT. CHATURBATE и CAM4 добавляем как дополнительные выводы; в выводе к этим сайтам остаётся вставить «ключ» и «сервер», которые берём с сайта.</div>
     </div>
     <ol class="callouts rv">
       <li data-n="1"><b>1</b><div><strong>Зачем</strong>Одна OBS на все сайты. Не открываем программу заново под каждую площадку — меньше нагрузка на ПК.</div></li>
       <li data-n="2"><b>2</b><div><strong>Панель</strong>Если панели нет, но плагин стоит: Док-панели → галочка «Множественный вывод».</div></li>
-      <li data-n="3"><b>3</b><div><strong>Основной сайт</strong>По умолчанию Chaturbate. Тогда в выводе кодировщик «Взять из OBS» тянет настройки CB.</div></li>
-      <li data-n="4"><b>4</b><div><strong>Не CB</strong>Если основной StripChat — его настройки идут в Cam4. Ключ и сервер вставляем с сайта.</div></li>
+      <li data-n="3"><b>3</b><div><strong>Основной сайт</strong>Stripchat. Тогда в выводе кодировщик «Взять из OBS» тянет настройки Stripchat.</div></li>
+      <li data-n="4"><b>4</b><div><strong>Доп. выводы</strong>Chaturbate и Cam4 — дополнительные выводы. Ключ и сервер вставляем с сайта.</div></li>
       <li data-n="5"><b>5</b><div><strong>Поля</strong>«Добавить новый вывод». URL — сервер с сайта. Ключ потока — с сайта. Кодировщик — «Взять из OBS».</div></li>
     </ol>
   </div>
@@ -719,7 +719,7 @@ pre.code .tg{color:#f472b6}pre.code .at{color:#7dd3fc}pre.code .ph{background:rg
         <li class="rv step"><span><b>1.</b> Сцена команды выбрана, камера внизу списка источников</span></li>
         <li class="rv step"><span><b>2.</b> Захват: Logi Capture / Snap Camera, 1920×1080, 30 fps</span></li>
         <li class="rv step"><span><b>3.</b> Микрофон в зелёной зоне, синхронизация 0, звук прослушан</span></li>
-        <li class="rv step"><span><b>4.</b> Профиль сайта верный. CB — основной вывод, не мульти</span></li>
+        <li class="rv step"><span><b>4.</b> Профиль сайта верный. Stripchat — основной вывод, CB — в мультивыводе</span></li>
         <li class="rv step"><span><b>5.</b> Мультивывод: ключи и серверы с площадок, кодировщик «из OBS»</span></li>
         <li class="rv step"><span><b>6.</b> Jasmin — отдельным приложением, не из этой OBS</span></li>
       </ul>
