@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Симулятор плана запуска смены — MENSORRY</title>
+<style>
+:root{
+  --bg:#0a0a0b; --card:#131316; --card2:#18181c; --card3:#1d1d22; --line:#232327; --line2:#2e2e35;
+  --txt:#e4e4e7; --num:#fafafa; --mut:#8b8b94;
+  --acc:#8b5cf6; --acc2:#a78bfa; --acc3:#c4b5fd; --green:#22c55e; --red:#ef4444; --red2:#f87171; --cyan:#38bdf8; --pink:#f472b6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.45}
+.num{font-variant-numeric:tabular-nums}
+a{color:var(--acc2)}
+button{font-family:inherit;cursor:pointer}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--acc);box-shadow:0 0 12px var(--acc);margin-right:10px}
+/* top bar */
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:18px;padding:10px 18px;background:rgba(10,10,11,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .brand{display:flex;align-items:center;font-weight:700;color:var(--num);letter-spacing:-.02em;white-space:nowrap}
+.top .brand small{color:var(--mut);font-weight:500;margin-left:8px}
+.stat{display:flex;flex-direction:column;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 12px;min-width:86px}
+.stat b{font-size:20px;color:var(--num);font-variant-numeric:tabular-nums;line-height:1.2}
+.stat span{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.stat.bad b{color:var(--red2)}
+.prog{flex:1;min-width:120px}
+.prog .bar{height:8px;background:#17171a;border-radius:99px;overflow:hidden}
+.prog .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#6d28d9,#a78bfa);box-shadow:0 0 14px rgba(139,92,246,.6);transition:width .5s cubic-bezier(.2,.7,.2,1)}
+.prog span{font-size:12px;color:var(--mut)}
+/* layout */
+.main{display:grid;grid-template-columns:330px 1fr;gap:16px;padding:16px;max-width:1500px;margin:0 auto}
+.panel{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.card h3{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--acc2)}
+.task .n{font-size:13px;color:var(--mut)}
+.task .t{font-size:20px;font-weight:700;color:var(--num);margin:2px 0 6px}
+.task .h{color:var(--txt);font-size:15px}
+.task.pro .h{color:var(--mut);font-style:italic}
+.log{max-height:260px;overflow:auto;font-size:14px}
+.log div{padding:6px 0;border-bottom:1px solid var(--line)}
+.log .ok{color:#86efac}.log .er{color:var(--red2)}
+.rule{font-size:14px;color:var(--mut)}
+.rule b{color:var(--num)}
+/* screen */
+.screen{position:relative;background:radial-gradient(1200px 600px at 70% 0%,#1a1430 0%,#0d0d10 60%);border:1px solid var(--line2);border-radius:20px;overflow:hidden;min-height:620px;display:flex;flex-direction:column}
+.win{flex:1;margin:14px 14px 0;background:var(--card);border:1px solid var(--line2);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;animation:pop .25s cubic-bezier(.2,.7,.2,1);box-shadow:0 20px 50px rgba(0,0,0,.45)}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
+.wt{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--card2);border-bottom:1px solid var(--line);font-size:14px;font-weight:600;color:var(--num)}
+.wt .lights{display:flex;gap:6px;margin-right:6px}.wt .lights i{width:11px;height:11px;border-radius:50%;background:#2e2e35}
+.wb{flex:1;overflow:auto;padding:16px}
+.taskbar{display:flex;gap:8px;padding:10px 14px;overflow-x:auto;border-top:1px solid var(--line);background:rgba(13,13,15,.9);margin-top:14px}
+.tb{flex:none;display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--line2);color:var(--txt);border-radius:12px;padding:8px 12px;font-size:14px;font-weight:600}
+.tb.on{border-color:var(--acc);background:#1e1832}
+.ico{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;flex:none}
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--card3);border:1px solid var(--line2);color:var(--txt);border-radius:12px;padding:10px 14px;font-size:14px;font-weight:600;margin:4px 6px 4px 0;transition:.15s;text-align:left}
+.btn:hover{border-color:var(--acc);color:var(--num)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.grn{background:#14532d;border-color:var(--green);color:#dcfce7}
+.btn.done{opacity:.55;border-style:dashed}
+.btn.done::before{content:"✓";color:var(--green)}
+.hl{animation:pulse 1.4s infinite;border-color:var(--acc2)!important}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(167,139,250,.65)}70%{box-shadow:0 0 0 10px rgba(167,139,250,0)}100%{box-shadow:0 0 0 0 rgba(167,139,250,0)}}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+/* desktop */
+.icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:14px}
+.dicon{background:transparent;border:1px solid transparent;border-radius:16px;padding:14px 8px;color:var(--txt);display:flex;flex-direction:column;align-items:center;gap:8px;font-size:14px;font-weight:600}
+.dicon:hover{background:var(--card2);border-color:var(--line2)}
+.dicon .ico{width:52px;height:52px;border-radius:16px;font-size:20px}
+.lock{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#060607}
+.power{width:96px;height:96px;border-radius:50%;border:2px solid var(--line2);background:var(--card);color:var(--acc2);font-size:40px}
+.power:hover{border-color:var(--acc)}
+/* browser */
+.tabs{display:flex;gap:6px;padding:8px 10px 0;background:var(--card2);overflow-x:auto;position:relative}
+.tab{flex:none;border:1px solid var(--line);border-bottom:none;background:#151518;color:var(--mut);border-radius:10px 10px 0 0;padding:7px 12px;font-size:13px;font-weight:600}
+.tab.on{background:var(--card);color:var(--num)}
+.plus{flex:none;border:1px solid var(--line2);background:transparent;color:var(--acc2);border-radius:10px;padding:4px 12px;font-size:18px;margin-bottom:4px}
+.menu{background:var(--card2);border:1px solid var(--line2);border-radius:14px;padding:10px;margin:0 0 12px}
+.menu .btn{margin:3px}
+.url{margin:0;padding:8px 14px;font:13px "Roboto Mono",ui-monospace,monospace;color:var(--mut);background:var(--card);border-bottom:1px solid var(--line)}
+.site{border-radius:14px;padding:16px;border:1px solid var(--line2);background:var(--card2)}
+.site h4{margin:0 0 8px;font-size:18px;color:var(--num)}
+.pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:12px;font-weight:700;background:#26262c;color:var(--mut)}
+.pill.on{background:#14532d;color:#86efac}.pill.off{background:#3f1d1d;color:#fca5a5}
+.big{font-size:64px;font-weight:800;color:var(--num);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.acc{font:13px "Roboto Mono",monospace;color:var(--mut);padding:6px 0;border-bottom:1px solid var(--line)}
+/* telegram */
+.tg{display:grid;grid-template-columns:200px 1fr;gap:12px;height:100%}
+.chats .btn{display:flex;width:100%;margin:0 0 6px}
+.chat{display:flex;flex-direction:column;gap:8px;min-height:240px}
+.msgs{flex:1;display:flex;flex-direction:column;gap:6px;background:#0f0f12;border-radius:14px;padding:12px;min-height:180px;max-height:330px;overflow:auto}
+.m{max-width:85%;padding:8px 12px;border-radius:14px;background:var(--card3);font-size:14px;white-space:pre-line}
+.m.me{align-self:flex-end;background:#2e1f5e}
+.m small{display:block;color:var(--mut);font-size:11px}
+/* obs */
+.obs{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}
+.prev{aspect-ratio:16/9;border-radius:12px;background:linear-gradient(135deg,#2a1d3f,#3b2a4a 50%,#1e293b);position:relative;display:grid;place-items:center;color:#c4b5fd;font-weight:700;overflow:hidden}
+.prev .live{position:absolute;top:10px;left:10px}
+.dock{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px}
+.dock h5{margin:0 0 6px;font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.meter{height:10px;border-radius:99px;background:linear-gradient(90deg,#22c55e 0 60%,#eab308 60% 85%,#ef4444 85%);position:relative;opacity:.9}
+.meter i{position:absolute;top:-3px;bottom:-3px;width:3px;background:#fff;left:55%;border-radius:2px}
+/* overlays */
+.ov{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:var(--card);border:1px solid var(--line2);border-radius:22px;padding:22px;max-width:620px;width:100%;max-height:92vh;overflow:auto;animation:pop .25s}
+.modal h2{margin:0 0 10px;color:var(--num);font-size:22px}
+.modal .opt{display:block;width:100%;margin:8px 0}
+.tag{display:inline-block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--red2);margin-bottom:6px}
+label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+input[type=text]{width:100%;background:#0f0f12;border:1px solid var(--line2);border-radius:12px;padding:11px 12px;color:var(--num);font-size:16px;font-family:inherit}
+input.err{border-color:var(--red)}
+.ferr{color:var(--red2);font-size:13px;min-height:18px}
+.brief{background:var(--card2);border-radius:14px;padding:12px 14px;font-size:14px}
+.brief b{color:var(--num)}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.choice button{background:var(--card2);border:1px solid var(--line2);border-radius:16px;padding:14px;color:var(--txt);text-align:left}
+.choice button.on{border-color:var(--acc);background:#1e1832}
+.choice b{display:block;color:var(--num);font-size:17px}
+.choice span{font-size:13px;color:var(--mut)}
+.res{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.mist{border-left:3px solid var(--red);background:var(--card2);border-radius:10px;padding:8px 12px;margin:8px 0;font-size:14px}
+.mist b{color:var(--red2)}
+.toast{pointer-events:none;position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);opacity:0;z-index:60;background:var(--card3);border:1px solid var(--line2);border-radius:14px;padding:10px 16px;font-weight:600;transition:.25s;max-width:92vw}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.toast.ok{border-color:var(--green)}.toast.er{border-color:var(--red);color:#fecaca}
+.hide{display:none!important}
+@media (max-width:900px){
+  .main{grid-template-columns:1fr;padding:10px}
+  .top{flex-wrap:wrap;gap:8px;padding:8px 10px}
+  .top .brand small{display:none}
+  .stat{min-width:70px;padding:3px 9px}.stat b{font-size:17px}
+  .prog{flex-basis:100%;order:9}
+  .log{max-height:120px}
+  .screen{min-height:560px}
+  .win{margin:8px 8px 0}
+  .obs,.grid2,.tg{grid-template-columns:1fr}
+  .chats{display:flex;gap:6px}.chats .btn{width:auto}
+  .big{font-size:48px}
+  .choice,.res{grid-template-columns:1fr}
+  .panel .rulecard{display:none}
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="brand"><span class="dot"></span>MENSORRY<small>симулятор запуска смены</small></div>
+  <div class="stat"><span>МСК</span><b id="clk" class="num">17:00</b></div>
+  <div class="stat"><span>Очки</span><b id="sc" class="num">0</b></div>
+  <div class="stat" id="mstat"><span>Ошибки</span><b id="mi" class="num">0</b></div>
+  <div class="prog"><span id="pt">Шаг 0 из 17</span><div class="bar"><i id="pb"></i></div></div>
+</div>
+<div class="main">
+  <div class="panel">
+    <div class="card task" id="task"><h3>Текущий шаг</h3><div class="n" id="tn"></div><div class="t" id="tt"></div><div class="h" id="th"></div></div>
+    <div class="card brief"><h3>Смена</h3><div id="briefTxt"></div></div>
+    <div class="card"><h3>Журнал</h3><div class="log" id="log"></div></div>
+    <div class="card rulecard rule"><b>8:30 чистого онлайна строго.</b> Брейки не в счёт: брейк сдвигает конец смены. Отчёты и кружки — в группу П2 К1 с продюсером, время — только с вкладки точного МСК.<br><a href="../urok3/">Урок 3: план запуска</a> · <a href="../pravila/">Правила и OBS</a></div>
+  </div>
+  <div class="screen" id="screen"></div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="ov" id="ov"></div>
+<script>
+(function(){
+var SHIFT=18*60, START=17*60, MODEL="Алиса Ветрова", PROD="Орлов Максим", GROUP="П2 К1";
+var DATE=new Date().toLocaleDateString("ru-RU",{timeZone:"Europe/Moscow",day:"2-digit",month:"2-digit",year:"numeric"});
+var STEPS=[
+{id:"pc",t:"Включить компьютер",h:"Нажми кнопку питания. Включил ПК — это ещё не смена.",w:"Первым делом включаешь компьютер.",need:["pc_on"],m:2},
+{id:"apps",t:"Открыть Jasmin и OBS",h:"Сразу с рабочего стола открой Jasmin и OBS — пусть обновятся до эфира.",w:"Jasmin и OBS открываются сразу после включения ПК: программы обновляются, и это должно случиться до эфира, а не в минус 2 минуты.",need:["open_jasmin","open_obs"],m:2},
+{id:"google",t:"Браузер и Google",h:"Открой браузер и войди в свой рабочий аккаунт Google.",w:"Шаг 3: браузер и рабочий аккаунт Google — до вкладок сайтов.",need:["br_open","g_login"],m:2},
+{id:"tabs",t:"Вкладки сайтов",h:"Кнопкой «+» в браузере открой все площадки: Stripchat, Chaturbate, Cam4, Jasmin. Пароли пока не вводим.",w:"Шаг 4: все площадки открываются заранее, ещё без паролей из CRM.",need:["tab_sc","tab_cb","tab_c4","tab_jas"],m:1},
+{id:"msk",t:"Точное МСК",h:"Кнопкой «+» открой отдельную вкладку с точным московским временем.",w:"Шаг 5: вкладка точного МСК открывается до кружков и отчётов — всё время берём только с неё.",need:["tab_msk"],m:1},
+{id:"tg",t:"Telegram",h:"Открой Telegram и группу с продюсером П2 К1. Она открыта до конца смены.",w:"Шаг 6: Telegram и группа П2 К1 открываются до кружков.",need:["open_tg","tg_group"],m:1},
+{id:"circle",t:"Твой кружок",h:"В группу П2 К1: кружок с лицом и точным МСК с вкладки. Не позднее чем за 30 минут до смены.",w:"Шаг 7: свой кружок с лицом и точным МСК — не позднее чем за 30 минут до начала смены.",need:["tg_circle_me"],m:2},
+{id:"model",t:"Кружок с моделью",h:"Модель пришла — отправь такой же кружок с ней в П2 К1.",w:"Кружок с моделью отправляется, когда она пришла. Без него смену не считаем собранной.",need:["tg_circle_model"],m:2},
+{id:"crm",t:"Смена в CRM",h:"Кнопкой «+» открой CRM, найди свою смену и нажми зелёный треугольник — откроются доступы.",w:"Шаг 8: в CRM находишь смену и жмёшь зелёный треугольник, чтобы открылись доступы к сайтам.",need:["tab_crm","crm_triangle"],m:1},
+{id:"login",t:"Вход на сайты",h:"На каждой вкладке сайта войди с логином и паролем из доступов CRM.",w:"Шаг 9: логин и пароль — только из доступов CRM, после зелёного треугольника.",need:["login_sc","login_cb","login_c4","login_jas"],m:1},
+{id:"income",t:"Скрины дохода",h:"На каждом сайте открой доход и сделай скрин, затем загрузи все скрины в окно CRM. «Начать смену» пока не трогаешь.",w:"Шаг 9: скрины дохода со всех сайтов делаются до старта и загружаются в окно CRM.",need:["inc_sc","inc_cb","inc_c4","inc_jas","crm_upload"],last:"crm_upload",m:1},
+{id:"obs",t:"OBS и виртуальная камера",h:"OBS: Stripchat — основной вывод, сервер и ключ с сайта. Chaturbate и Cam4 — в «Множественный вывод». Включи виртуальную камеру и в Jasmin выбери VIRTUAL OBS CAMERA.",w:"Шаг 10: ключи, мультивывод и виртуальная камера настраиваются после скринов и до старта смены.",need:["obs_key_sc","obs_multi_cb","obs_multi_c4","obs_vcam","jas_vcam"],m:1},
+{id:"room",t:"Кадр и раскладка",h:"В OBS, блок «Перед стартом»: кадр, свет, масло, игрушки, вода. Игрушка настроена до старта. Выбери правильную раскладку экрана.",w:"Шаг 11: кадр, свет, игрушка и раскладка экрана проверяются до старта смены.",need:["room_frame","room_light","room_oil","room_toy","room_water","room_layout"],m:1},
+{id:"start",t:"CRM: «Начать смену»",h:"Только сейчас в CRM жмёшь «Начать смену». Время запуска = начало смены.",w:"Шаг 12: «Начать смену» в CRM жмёшь только после скринов дохода, OBS и проверки кадра.",need:["crm_start"],m:1},
+{id:"bots",t:"Боты в доступах",h:"В том же окне CRM нажми «Начать работу» на всех ботах. Окно сворачиваешь до конца смены.",w:"«Начать работу» на ботах — сразу после «Начать смену», в том же окне CRM.",need:["crm_bots"],m:1},
+{id:"stream",t:"Трансляция",h:"Запусти трансляцию в OBS, нажми «Начать» в Jasmin и проверь, что все сайты в онлайне.",w:"Эфир запускается после старта смены в CRM и ботов.",need:["obs_stream","jas_start","check_online"],last:"check_online",m:1},
+{id:"report",t:"Отчёт в группу",h:"В группе П2 К1 нажми «Отчёт о старте» и заполни шаблон — одним сообщением, в момент запуска.",w:"Отчёт пишется одним сообщением по шаблону в момент запуска.",need:["report_send"],m:1}
+];
+var TRAPS={
+trap_mem:["Пароль «по памяти»","Логин и пароль — только из доступов CRM. Свои «запомнил» не используем."],
+trap_cbmain:["Chaturbate основным выводом","Сейчас основной вывод OBS — Stripchat. Chaturbate и Cam4 добавляются через «Множественный вывод»."],
+trap_c4bal:["Доход Cam4 не там","На Cam4 доход: Аватар → Личный кабинет стримера → История дохода."],
+trap_jascam:["В Jasmin выбрана вебка напрямую","В Jasmin, Flirt и Cam4 выбираем VIRTUAL OBS CAMERA."],
+trap_layout:["Неверная раскладка экрана","Центр — Chaturbate + Stripchat, лево — Cam4 + CamSoda, право — Jasmin + Flirt4Free."],
+trap_phone:["Время в кружке с телефона","Время в кружках и отчётах — только с вкладки точного МСК."],
+trap_later:["Отчёт «потом»","Отчёт — одним сообщением по шаблону в момент запуска. Не «через 10 минут напишу»."],
+trap_jasscale:["Доход Jasmin без масштаба","Jasmin: Статистика → Просмотр дохода, масштаб страницы 67%, чтобы были видны обе таблицы: онлайн и офлайн."]
+};
+var INC=[
+{id:"pass",at:"login",q:"Забыл пароль от Chaturbate. Что делаешь?",o:[["Открываю доступы смены в CRM и беру логин и пароль оттуда",1],["Пробую пароли, которые помню, пока не подойдёт",0],["Пишу модели, пусть вспомнит",0]],e:"Логин и пароль — только из доступов CRM."},
+{id:"late",at:"model",q:"Модель не пришла и не отвечает в чате. Что делаешь?",o:[["Звоню модели и сразу пишу продюсеру в П2 К1; если старт сдвинется — причину укажу в отчёте",1],["Жду молча, может придёт",0],["Начинаю смену без модели, кружок отправлю потом",0]],e:"Без кружка модели смена не собрана. Продюсер узнаёт сразу, причина опоздания идёт в отчёт.",cost:7},
+{id:"mic",at:"obs",q:"В микшере OBS нет микрофона. Что делаешь?",o:[["Настройки → Аудио → Микрофон: выбираю устройство и держу уровень в зелёной зоне",1],["Перезагружаю компьютер",0],["Запускаю эфир без звука, разберусь потом",0]],e:"Если микрофона нет: Настройки → Аудио → Микрофон. Уровень — в зелёной зоне."},
+{id:"vcam",after:"jas_vcam",q:"В Jasmin не видно VIRTUAL OBS CAMERA. Что делаешь?",o:[["Проверяю, что виртуальная камера в OBS включена и источник выбран, перезапускаю Jasmin и снова выбираю VIRTUAL OBS CAMERA",1],["Выбираю в Jasmin вебку напрямую",0],["Переустанавливаю OBS",0]],e:"Виртуальная камера включается в OBS с выбранным источником; в Jasmin, Flirt и Cam4 — VIRTUAL OBS CAMERA."},
+{id:"site",after:"obs_stream",q:"OBS в эфире, а Chaturbate висит в «Waiting for stream to start». Что делаешь?",o:[["Проверяю в «Множественном выводе» сервер и ключ Chaturbate — они должны быть с сайта — и перезапускаю этот вывод",1],["Жду, само запустится",0],["Делаю Chaturbate основным выводом вместо Stripchat",0]],e:"Ключ и сервер в мультивыводе берутся с самого сайта. Основной вывод остаётся Stripchat."},
+{id:"bitrate",after:"check_online",q:"Через пару минут после старта падает битрейт. Что делаешь?",o:[["Делаю speedtest, ставлю ближайший сервер вместо автовыбора и регулирую битрейт по нагрузке (Stripchat 2500–5000)",1],["Ставлю битрейт на максимум",0],["Перезапускаю трансляцию каждые 5 минут",0]],e:"Сервер — ближайший, автовыбор часто врёт. Битрейт Stripchat 2500–5000, регулируем по нагрузке."}
+];
+var WINS={desk:["Рабочий стол","#3b3b45","⌂"],br:["Браузер","#2563eb","G"],tg:["Telegram","#0ea5e9","T"],obs:["OBS Studio","#6d28d9","O"],jas:["Jasmin","#db2777","J"]};
+var SITES={sc:["Stripchat","#ef4444"],cb:["Chaturbate","#f97316"],c4:["Cam4","#06b6d4"],jas:["Jasmin","#db2777"],msk:["Точное МСК","#22c55e"],crm:["CRM","#8b5cf6"]};
+var S;
+function $(id){return document.getElementById(id)}
+function fmt(m){var h=Math.floor(m/60),mm=m%60;return (h<10?"0":"")+h+":"+(mm<10?"0":"")+mm}
+function has(a){return S.done.indexOf(a)>=0}
+function stepOf(a){for(var i=0;i<STEPS.length;i++){if(STEPS[i].need.indexOf(a)>=0)return i}return -1}
+function safe(t){return String(t).replace(/</g,"‹").replace(/>/g,"›")}
+function cls(a){var c="";if(has(a))c+=" done";if(isHint(a))c+=" hl";return c}
+function B(a,label,extra){return '<button class="btn'+(extra?" "+extra:"")+cls(a)+'" data-a="'+a+'">'+label+'</button>'}
+function pending(){var st=STEPS[S.idx];if(!st)return [];var r=[];st.need.forEach(function(a){if(!has(a)){if(a!==st.last){r.push(a)}else{var others=st.need.filter(function(x){return x!==a});if(others.every(has))r.push(a)}}});return r}
+function isHint(a){if(S.mode!=="nov")return false;return pending().indexOf(a)>=0}
+function winOf(a){if(a==="pc_on")return "lock";if(/^open_|^br_open/.test(a))return "desk";if(/^(tab_|g_login|login_|inc_|crm_)/.test(a))return "br";if(/^(tg_|report)/.test(a))return "tg";if(/^jas_/.test(a))return "jas";return "obs"}
+function tabOf(a){if(/^tab_/.test(a))return "+";if(a==="g_login")return "google";var m=a.match(/^(login|inc)_(\w+)/);if(m)return m[2];if(/^crm_/.test(a))return "crm";return null}
+
+function newGame(mode){
+  S={mode:mode,idx:0,done:[],score:0,clock:START,mist:[],log:[],win:"desk",tab:"google",menu:false,chat:"g",msgs:[{me:0,t:"Продюсер "+PROD+": Доброе утро, команда. Кружки — не позже чем за 30 минут до смены.",at:START-40}],mmsgs:[{me:0,t:"Привет! Буду к 17:35",at:START-20}],launch:null,late:false,over:false,t0:Date.now(),incPlan:[],incShown:[],queue:[],modal:false};
+  var pool=INC.slice();
+  var force=/all=1/.test(location.search);
+  pool.sort(function(){return Math.random()-.5});
+  S.incPlan=(force?pool:pool.slice(0,4)).map(function(x){return x.id});
+  renderBrief();render();closeOv();
+}
+function addLog(t,ok){S.log.unshift({t:"["+fmt(S.clock)+"] "+t,ok:ok})}
+function toast(t,ok){var el=$("toast");el.textContent=t;el.className="toast show "+(ok?"ok":"er");clearTimeout(toast.h);toast.h=setTimeout(function(){el.className="toast"},2200)}
+function mistake(title,expl,pen){
+  var p=pen||15;if(S.mode==="pro")p=Math.round(p*1.6);
+  S.score-=p;S.clock+=2;S.mist.push({t:title,e:expl,at:fmt(S.clock)});
+  addLog("−"+p+" · "+title,false);toast("−"+p+" · "+title+(S.mode==="nov"?" — "+expl:""),false);
+  var sc=$("screen");sc.classList.remove("shake");void sc.offsetWidth;sc.classList.add("shake");
+}
+function navEffect(a){
+  if(a==="open_jasmin")S.win="jas";else if(a==="open_obs")S.win="obs";else if(a==="br_open")S.win="br";else if(a==="open_tg")S.win="tg";
+  var m=a.match(/^tab_(\w+)$/);if(m){S.tab=m[1];S.menu=false;S.win="br"}
+  if(a==="tg_group")S.chat="g";
+}
+function act(a){
+  if(S.over||S.modal)return;
+  if(a==="report_open"){if(STEPS[S.idx].id==="report"){openReport()}else{mistake("Отчёт раньше времени","Отчёт о старте пишется в момент запуска — после «Начать смену», ботов и трансляции.")}render();return}
+  if(TRAPS[a]){mistake(TRAPS[a][0],TRAPS[a][1]);render();return}
+  if(has(a)){navEffect(a);render();return}
+  var st=STEPS[S.idx], si=stepOf(a);
+  if(si===S.idx){
+    if(st.last===a){var others=st.need.filter(function(x){return x!==a});if(!others.every(has)){mistake("Рано: "+labelOf(a),st.last==="crm_upload"?"Сначала скрины дохода со всех сайтов, потом загрузка в CRM.":"Сначала запусти эфир в OBS и в Jasmin, потом проверяй сайты.",10);render();return}}
+    S.done.push(a);S.score+=10;S.clock+=st.m;navEffect(a);
+    onAction(a);
+    if(st.need.every(has)){addLog("✓ "+st.t,true);toast("+10 · "+st.t+" — готово",true);S.idx++;onStep()}else{toast("+10",true)}
+    checkAfter(a);render();return
+  }
+  if(si>S.idx){mistake("Не по порядку: "+STEPS[si].t,"Сейчас шаг «"+st.t+"». "+STEPS[si].w);render();return}
+}
+function labelOf(a){return a==="crm_upload"?"загрузка скринов":"проверка сайтов"}
+function onAction(a){
+  if(a==="tg_circle_me"){S.msgs.push({me:1,t:"● Кружок: лицо + "+fmt(S.clock)+" МСК",at:S.clock});if(S.clock>SHIFT-30){S.score-=20;S.mist.push({t:"Кружок позже чем за 30 минут",e:"Свой кружок отправляется не позднее чем за 30 минут до начала смены (до "+fmt(SHIFT-30)+" МСК).",at:fmt(S.clock)});addLog("−20 · кружок опоздал",false)}}
+  if(a==="tg_circle_model"){S.msgs.push({me:1,t:"● Кружок с моделью "+MODEL+" · "+fmt(S.clock)+" МСК",at:S.clock});S.mmsgs.push({me:0,t:"Я на месте",at:S.clock})}
+  if(a==="crm_start"){
+    if(S.clock<SHIFT){S.clock=SHIFT;addLog("Дождался "+fmt(SHIFT)+" по точному МСК",true)}
+    S.launch=S.clock;
+    if(S.clock>SHIFT){S.late=true;S.score-=20;S.mist.push({t:"Поздний старт: "+fmt(S.clock),e:"Смена должна стартовать в "+fmt(SHIFT)+". Опоздание — причина в отчёте и «Упущенное время отработаем».",at:fmt(S.clock)});addLog("−20 · старт позже "+fmt(SHIFT),false)}
+  }
+}
+function onStep(){
+  var st=STEPS[S.idx];
+  if(!st){finish();return}
+  if(st.id==="model")S.mmsgs.push({me:0,t:"Поднимаюсь",at:S.clock});
+  INC.forEach(function(x){if(x.at===st.id)queueInc(x)});
+}
+function checkAfter(a){INC.forEach(function(x){if(x.after===a)queueInc(x)});showNext()}
+function queueInc(x){if(S.incPlan.indexOf(x.id)<0)return;if(S.incShown.indexOf(x.id)>=0)return;S.incShown.push(x.id);S.queue.push(x);setTimeout(showNext,500)}
+function showNext(){if(S.modal||!S.queue.length||S.over)return;var x=S.queue.shift();S.modal=true;
+  var opts=x.o.slice().sort(function(){return Math.random()-.5});
+  var h='<div class="modal"><span class="tag">Инцидент · '+fmt(S.clock)+' МСК</span><h2>'+x.q+'</h2>';
+  opts.forEach(function(o,i){h+='<button class="btn opt" data-inc="'+x.id+'" data-ok="'+o[1]+'">'+String.fromCharCode(65+i)+'. '+o[0]+'</button>'});
+  h+='</div>';ov(h);
+}
+function incAnswer(id,ok){var x=INC.filter(function(y){return y.id===id})[0];S.modal=false;closeOv();
+  if(ok==="1"){S.score+=20;S.clock+=2;addLog("+20 · инцидент решён",true);toast("+20 · верно: "+x.e,true)}
+  else{S.modal=false;var p=S.mode==="pro"?25:15;S.score-=p;S.clock+=5;S.mist.push({t:"Инцидент: "+x.q,e:x.e,at:fmt(S.clock)});addLog("−"+p+" · инцидент",false);toast("Неверно: "+x.e,false)}
+  if(x.cost)S.clock+=x.cost;
+  render();setTimeout(showNext,400);
+  if(!STEPS[S.idx])finish();
+}
+function ov(h){var o=$("ov");o.innerHTML=h;o.classList.remove("hide")}
+function closeOv(){$("ov").classList.add("hide");$("ov").innerHTML=""}
+function openReport(){S.modal=true;
+  var h='<div class="modal"><span class="tag" style="color:var(--acc2)">Шаблон отчёта на старт</span><h2>Отчёт в группу '+GROUP+'</h2><div class="brief">Данные смены: продюсер <b>'+PROD+'</b>, модель <b>'+MODEL+'</b>. Дата и время — с вкладки точного МСК: <b>'+DATE+'</b>, запуск в <b>'+fmt(S.launch)+'</b>.</div>'+
+  F("f_date","Дата (ДД.ММ.ГГГГ)")+F("f_prod","Продюсер")+F("f_op","Оператор (твоё вымышленное имя)")+F("f_mod","Модель")+F("f_time","Начало смены (ЧЧ:ММ)");
+  if(S.late){h+=F("f_why","Причина опоздания")+'<label><input type="checkbox" id="f_ok"> Упущенное время отработаем</label>'}
+  h+='<div class="ferr" id="ferr"></div><button class="btn pri" id="rsend">Отправить одним сообщением</button></div>';ov(h);
+}
+function F(id,l){return '<label for="'+id+'">'+l+'</label><input type="text" id="'+id+'" autocomplete="off">'}
+function norm(v){return String(v||"").trim().replace(/\s+/g," ").toLowerCase().replace(/ё/g,"е")}
+function sendReport(){
+  var bad=[],get=function(id){return $(id).value};
+  function chk(id,ok){$(id).classList.toggle("err",!ok);if(!ok)bad.push(id)}
+  chk("f_date",norm(get("f_date"))===norm(DATE));
+  chk("f_prod",norm(get("f_prod"))===norm(PROD));
+  chk("f_op",norm(get("f_op")).length>=2);
+  chk("f_mod",norm(get("f_mod"))===norm(MODEL));
+  chk("f_time",norm(get("f_time"))===fmt(S.launch));
+  if(S.late){chk("f_why",norm(get("f_why")).length>=3);if(!$("f_ok").checked)bad.push("f_ok")}
+  if(bad.length){S.score-=5;S.mist.push({t:"Ошибка в отчёте",e:"Обязательные поля: дата, продюсер, оператор, модель, начало смены"+(S.late?", причина опоздания и «Упущенное время отработаем»":"")+". Дата и время — по точному МСК.",at:fmt(S.clock)});addLog("−5 · отчёт с ошибками",false);$("ferr").textContent="Проверь поля, подсвеченные красным"+(bad.indexOf("f_ok")>=0?", и отметь «Упущенное время отработаем»":"")+".";render();return}
+  var txt=get("f_date").trim()+"\nПродюсер: "+get("f_prod").trim()+"\nОператор: "+get("f_op").trim()+"\nМодель: "+get("f_mod").trim()+"\nНачало смены: "+get("f_time").trim();
+  if(S.late)txt+="\nПричина: "+get("f_why").trim()+"\nУпущенное время отработаем.";
+  S.msgs.push({me:1,t:txt,at:S.clock});S.op=get("f_op").trim();
+  S.modal=false;closeOv();act("report_send");
+}
+function finish(){if(S.over)return;if(S.modal||S.queue.length){setTimeout(finish,600);return}S.over=true;render();
+  var real=Math.round((Date.now()-S.t0)/1000), end=S.launch+510;
+  var grade=S.mist.length===0?"Идеальный запуск":S.mist.length<=3?"Хороший запуск":"Нужно потренироваться";
+  var h='<div class="modal"><span class="tag" style="color:var(--green)">Смена запущена</span><h2>'+grade+'</h2><div class="res">'+R("Очки",S.score)+R("Запуск, МСК",fmt(S.launch))+R("Время игры",Math.floor(real/60)+" мин "+(real%60)+" с")+'</div>'+
+  '<div class="brief">Конец смены не раньше <b>'+fmt(end%1440)+'</b> МСК: 8:30 чистого онлайна строго, каждый брейк сдвигает конец.</div>';
+  h+='<h3 style="margin:16px 0 4px">Ошибки: '+S.mist.length+'</h3>';
+  if(!S.mist.length)h+='<p class="rule">Ни одной ошибки. Так и держи.</p>';
+  S.mist.forEach(function(m){h+='<div class="mist"><b>'+safe(m.t)+'</b> · '+m.at+'<br>'+m.e+'</div>'});
+  h+='<div class="row" style="margin-top:14px"><button class="btn pri" data-restart="'+S.mode+'">Пройти ещё раз</button><button class="btn" data-menu="1">Сменить уровень</button><a class="btn" href="../urok3/">Урок 3</a></div></div>';
+  ov(h);
+}
+function R(l,v){return '<div class="stat"><span>'+l+'</span><b>'+v+'</b></div>'}
+function renderBrief(){$("briefTxt").innerHTML="Дата <b>"+DATE+"</b> · начало смены <b>"+fmt(SHIFT)+" МСК</b><br>Модель: <b>"+MODEL+"</b><br>Продюсер: <b>"+PROD+"</b> · группа <b>"+GROUP+"</b><br>Уровень: <b>"+(S.mode==="nov"?"Новичок (подсказки)":"Профи (без подсказок, штрафы выше)")+"</b>"}
+function render(){
+  $("clk").textContent=fmt(S.clock%1440);$("sc").textContent=S.score;$("mi").textContent=S.mist.length;
+  $("mstat").classList.toggle("bad",S.mist.length>0);
+  var n=Math.min(S.idx,STEPS.length);$("pt").textContent="Шаг "+n+" из "+STEPS.length;$("pb").style.width=(n/STEPS.length*100)+"%";
+  var st=STEPS[S.idx];
+  $("task").classList.toggle("pro",S.mode==="pro");
+  if(st){$("tn").textContent="Шаг "+(S.idx+1)+" из "+STEPS.length;$("tt").textContent=S.mode==="nov"?st.t:"Что дальше по плану?";$("th").textContent=S.mode==="nov"?st.h:"Подсказок нет. Действуй по плану запуска из урока 3."}
+  else{$("tn").textContent="Готово";$("tt").textContent="Смена запущена";$("th").textContent=""}
+  $("log").innerHTML=S.log.map(function(l){return '<div class="'+(l.ok?"ok":"er")+'">'+safe(l.t)+'</div>'}).join("");
+  var pend=pending(), hw={}, ht={};
+  if(S.mode==="nov")pend.forEach(function(a){hw[winOf(a)]=1;var t=tabOf(a);if(t)ht[t]=1});
+  var h="";
+  if(!has("pc_on")){h='<div class="lock"><button class="power'+(isHint("pc_on")?" hl":"")+'" data-a="pc_on" aria-label="Питание">⏻</button><div class="rule">Компьютер выключен. '+fmt(S.clock)+' МСК</div></div>'}
+  var w=WINS[S.win];
+  h+='<div class="win" key="'+S.win+'"><div class="wt"><span class="lights"><i></i><i></i><i></i></span>'+w[0]+'</div>'+(S.win==="br"?brTabs(ht):"")+'<div class="wb">'+winBody()+'</div></div>';
+  h+='<div class="taskbar">';
+  ["desk","jas","obs","br","tg"].forEach(function(k){
+    var open=k==="desk"||(k==="jas"?has("open_jasmin"):k==="obs"?has("open_obs"):k==="br"?has("br_open"):has("open_tg"));
+    if(!open)return;var c=WINS[k];
+    h+='<button class="tb'+(S.win===k?" on":"")+(hw[k]?(S.win!==k?" hl":""):"")+'" data-w="'+k+'"><span class="ico" style="background:'+c[1]+'">'+c[2]+'</span>'+c[0]+'</button>'});
+  h+='</div>';
+  var sc=$("screen"), prev=sc.getAttribute("data-cur");sc.innerHTML=h;sc.setAttribute("data-cur",S.win);
+  if(prev===S.win){var wn=sc.querySelector(".win");if(wn)wn.style.animation="none"}
+}
+function brTabs(ht){
+  var h='<div class="tabs">'+T("google","Google",ht);
+  ["sc","cb","c4","jas","msk","crm"].forEach(function(k){if(has("tab_"+k))h+=T(k,SITES[k][0],ht)});
+  h+='<button class="plus'+(ht["+"]?" hl":"")+'" data-menu-tab="1">+</button></div>';
+  var u={google:"accounts.google.com",sc:"stripchat.com",cb:"chaturbate.com",c4:"cam4.com",jas:"jasmin.com",msk:"time.is/Moscow",crm:"crm.studio"}[S.tab];
+  return h+'<p class="url">https://'+u+'</p>';
+}
+function T(k,l,ht){return '<button class="tab'+(S.tab===k?" on":"")+(ht[k]?(S.tab!==k?" hl":""):"")+'" data-tab="'+k+'">'+l+'</button>'}
+function winBody(){
+  if(S.win==="desk"){var h='<div class="icons">';
+    [["open_jasmin","jas","Jasmin"],["open_obs","obs","OBS"],["br_open","br","Браузер"],["open_tg","tg","Telegram"]].forEach(function(x){var c=WINS[x[1]];h+='<button class="dicon'+(isHint(x[0])?" hl":"")+'" data-a="'+x[0]+'"><span class="ico" style="background:'+c[1]+'">'+c[2]+'</span>'+x[2]+'</button>'});
+    return h+'</div><p class="rule" style="margin-top:24px">Рабочий стол. Порядок плана запуска нельзя менять — от этого зависят отчёт и доступы.</p>'}
+  if(S.win==="br")return brBody();
+  if(S.win==="tg")return tgBody();
+  if(S.win==="obs")return obsBody();
+  if(S.win==="jas")return jasBody();
+  return "";
+}
+function brBody(){
+  var h="";
+  if(S.menu){h+='<div class="menu"><div class="rule" style="margin-bottom:6px">Новая вкладка</div>';["sc","cb","c4","jas","msk","crm"].forEach(function(k){h+=B("tab_"+k,SITES[k][0])});h+='</div>'}
+  var t=S.tab;
+  if(t==="google"){return h+'<div class="site"><h4>Google</h4>'+(has("g_login")?'<p>Вошёл в рабочий аккаунт <b>studio.operator</b>. Открывай вкладки кнопкой «+».</p>':'<p>Войди в свой рабочий аккаунт.</p>'+B("g_login","Войти в рабочий аккаунт","pri"))+'</div>'}
+  if(t==="msk")return h+'<div class="site" style="text-align:center"><div class="rule">Точное московское время</div><div class="big">'+fmt(S.clock%1440)+'</div><div class="rule">Смена в '+fmt(SHIFT)+' · кружки и отчёты — по этим часам</div></div>';
+  if(t==="crm")return h+crmBody();
+  var s=SITES[t], live=t==="jas"?has("jas_start"):has("obs_stream");
+  h+='<div class="site" style="border-color:'+s[1]+'55"><h4 style="color:'+s[1]+'">'+s[0]+'</h4>';
+  if(!has("login_"+t)){h+='<p>Вход в аккаунт модели.</p>'+B("login_"+t,"Вставить логин и пароль из доступов CRM","pri")+B("trap_mem","Ввести пароль по памяти");return h+'</div>'}
+  h+='<div class="row"><b>model_alice</b><span class="pill num">$ 1 284.50</span><span class="pill '+(live?"on":"off")+'">'+(live?"ONLINE":"OFFLINE")+'</span></div><div style="margin-top:12px">';
+  if(t==="sc"||t==="cb")h+=B("inc_"+t,"Нажать на баланс рядом с ником → скрин");
+  if(t==="c4")h+=B("trap_c4bal","Баланс рядом с ником → скрин")+B("inc_c4","Аватар → Личный кабинет стримера → История дохода → скрин");
+  if(t==="jas")h+=B("trap_jasscale","Статистика → Просмотр дохода → скрин")+B("inc_jas","Статистика → Просмотр дохода, масштаб 67% → скрин");
+  if(has("inc_"+t))h+='<p class="rule">Скрин дохода сделан.</p>';
+  return h+'</div></div>';
+}
+function crmBody(){
+  var h='<div class="site"><h4>CRM · смены</h4><div class="row"><span class="pill">'+DATE+'</span><b>'+fmt(SHIFT)+' · '+MODEL+'</b>'+B("crm_triangle","▶","grn")+'</div>';
+  if(has("crm_triangle")){
+    h+='<div style="margin-top:12px"><div class="rule">Доступы к сайтам</div>';["sc","cb","c4","jas"].forEach(function(k){h+='<div class="acc">'+SITES[k][0]+' · логин model_alice_'+k+' · пароль ••••••••</div>'});
+    var n=["sc","cb","c4","jas"].filter(function(k){return has("inc_"+k)}).length;
+    h+='<div style="margin-top:12px">'+B("crm_upload","Загрузить скрины дохода ("+n+"/4)")+B("crm_start","Начать смену","pri")+'</div>';
+    if(has("crm_start"))h+='<div style="margin-top:8px"><div class="rule">Смена идёт с '+fmt(S.launch)+'. Боты:</div>'+B("crm_bots","Начать работу на всех ботах","grn")+'</div>';
+    h+='</div>';
+  }else h+='<p class="rule">Нажми зелёный треугольник, чтобы открылись доступы.</p>';
+  return h+'</div>';
+}
+function tgBody(){
+  var h='<div class="tg"><div class="chats">'+B("tg_group","П2 К1 · команда")+'<button class="btn'+(S.chat==="m"?" on":"")+'" data-chat="m">Алиса · модель</button></div><div class="chat">';
+  if(!has("tg_group")){return h+'<p class="rule">Выбери чат.</p></div></div>'}
+  var list=S.chat==="m"?S.mmsgs:S.msgs;
+  h+='<div class="rule">'+(S.chat==="m"?"Чат с моделью":"Группа "+GROUP+" · продюсер "+PROD)+'</div><div class="msgs">';
+  list.forEach(function(m){h+='<div class="m'+(m.me?" me":"")+'"><small>'+fmt(m.at%1440)+'</small>'+safe(m.t)+'</div>'});
+  h+='</div>';
+  if(S.chat==="g")h+='<div>'+B("tg_circle_me","Кружок: лицо + время с вкладки МСК")+B("trap_phone","Кружок: время с часов телефона")+B("tg_circle_model","Кружок с моделью")+'<button class="btn'+(STEPS[S.idx]?(STEPS[S.idx].id==="report"?(S.mode==="nov"?" hl":""):""):"")+'" data-a="report_open">Отчёт о старте</button>'+B("trap_later","Напишу отчёт через 10 минут")+'</div>';
+  return h+'</div></div>';
+}
+function obsBody(){
+  var live=has("obs_stream");
+  var h='<div class="obs"><div><div class="prev">'+(live?'<span class="pill on live">LIVE · Stripchat + 2</span>':'<span class="pill live">Превью</span>')+'Lovense Webcam 2</div>';
+  h+='<div class="grid2" style="margin-top:10px"><div class="dock"><h5>Сцены</h5>Смена</div><div class="dock"><h5>Источники</h5>Камера Lovense<br>Оверлей Lovense</div></div>';
+  h+='<div class="dock"><h5>Микшер аудио · Микрофон</h5><div class="meter"><i></i></div></div>';
+  h+='<div class="dock"><h5>Перед стартом</h5>'+B("room_frame","Кадр")+B("room_light","Свет")+B("room_oil","Масло")+B("room_toy","Игрушка настроена")+B("room_water","Вода")+'<div class="rule" style="margin-top:6px">Раскладка экрана:</div>'+B("trap_layout","Центр: Jasmin + Flirt4Free · лево: CB + SC")+B("room_layout","Центр: CB + Stripchat · лево: Cam4 + CamSoda · право: Jasmin + Flirt4Free")+'</div></div><div>';
+  h+='<div class="dock"><h5>Вывод · основной</h5>'+B("obs_key_sc","Stripchat: сервер и ключ с сайта")+B("trap_cbmain","Chaturbate основным")+'</div>';
+  h+='<div class="dock"><h5>Множественный вывод</h5>'+B("obs_multi_cb","+ Chaturbate (сервер и ключ с сайта)")+B("obs_multi_c4","+ Cam4 (сервер и ключ с сайта)")+'</div>';
+  h+='<div class="dock"><h5>Управление</h5>'+B("obs_vcam",has("obs_vcam")?"Виртуальная камера включена":"Запустить виртуальную камеру")+B("obs_stream",live?"Трансляция идёт":"Запустить трансляцию","pri")+B("check_online","Проверить, что все сайты в онлайне")+'</div></div></div>';
+  return h;
+}
+function jasBody(){
+  return '<div class="site" style="border-color:#db277755"><h4 style="color:#f472b6">Jasmin · приложение</h4><div class="rule">Источник камеры</div>'+B("jas_vcam","VIRTUAL OBS CAMERA")+B("trap_jascam","Lovense Webcam 2 (напрямую)")+'<div style="margin-top:12px"><span class="pill '+(has("jas_start")?"on":"off")+'">'+(has("jas_start")?"В ЭФИРЕ":"НЕ В ЭФИРЕ")+'</span></div><div style="margin-top:12px">'+B("jas_start","Начать","pri")+'</div><p class="rule">Jasmin и Flirt4Free — свои программы, камера в них — VIRTUAL OBS CAMERA.</p></div>';
+}
+function startMenu(){
+  var sel="nov";
+  var h='<div class="modal"><span class="tag" style="color:var(--acc2)">MENSORRY · тренажёр</span><h2>Симулятор плана запуска смены</h2><p>Ты оператор. Пройди план запуска из урока 3 по порядку: от включения ПК до отчёта в группу. Кликай по окнам, вкладкам и кнопкам. Не тот порядок — штраф и подсказка. По ходу будут инциденты.</p><div class="brief">Смена в <b>'+fmt(SHIFT)+' МСК</b>, сейчас <b>'+fmt(START)+'</b>. Модель <b>'+MODEL+'</b>, продюсер <b>'+PROD+'</b>, группа <b>'+GROUP+'</b>. Имена вымышленные.<br><b>8:30 чистого онлайна строго</b>, брейки не в счёт.</div>'+
+  '<div class="choice"><button class="on" data-lvl="nov"><b>Новичок</b><span>Подсказки и подсветка следующего действия</span></button><button data-lvl="pro"><b>Профи</b><span>Без подсказок, штрафы выше</span></button></div><button class="btn pri" id="go">Начать</button> <a class="btn" href="../urok3/">Сначала урок 3</a></div>';
+  ov(h);
+}
+document.addEventListener("click",function(e){
+  var t=e.target.closest("button,a");if(!t)return;
+  if(t.hasAttribute("data-lvl")){document.querySelectorAll("[data-lvl]").forEach(function(b){b.classList.remove("on")});t.classList.add("on");return}
+  if(t.id==="go"){var on=document.querySelector("[data-lvl].on");newGame(on?on.getAttribute("data-lvl"):"nov");return}
+  if(t.id==="rsend"){sendReport();return}
+  if(t.hasAttribute("data-inc")){incAnswer(t.getAttribute("data-inc"),t.getAttribute("data-ok"));return}
+  if(t.hasAttribute("data-restart")){newGame(t.getAttribute("data-restart"));return}
+  if(t.hasAttribute("data-menu")){startMenu();return}
+  if(!S||S.modal)return;
+  var now=Date.now(),L=window.__lc||{t:0,x:-99,y:-99};if(now-L.t<600){if(Math.abs(e.clientX-L.x)<16){if(Math.abs(e.clientY-L.y)<16)return}}window.__lc={t:now,x:e.clientX,y:e.clientY};
+  if(t.hasAttribute("data-a")){act(t.getAttribute("data-a"));return}
+  if(t.hasAttribute("data-w")){S.win=t.getAttribute("data-w");render();return}
+  if(t.hasAttribute("data-tab")){S.tab=t.getAttribute("data-tab");S.menu=false;render();return}
+  if(t.hasAttribute("data-menu-tab")){S.menu=!S.menu;render();return}
+  if(t.hasAttribute("data-chat")){S.chat="m";render();return}
+});
+setInterval(function(){if(S){if(!S.over){if(!S.modal){if(has("pc_on")){S.clock+=1;$("clk").textContent=fmt(S.clock%1440);var bg=document.querySelector(".big");if(bg)bg.textContent=fmt(S.clock%1440)}}}}},20000);
+S={mode:"nov",idx:0,done:[],score:0,clock:START,mist:[],log:[],win:"desk",tab:"google",msgs:[],mmsgs:[],incPlan:[],incShown:[],queue:[],modal:true,t0:Date.now()};
+renderBrief();render();startMenu();
+window.__sim={get:function(){return S},steps:STEPS};
+})();
+</script>
+</body>
+</html>
