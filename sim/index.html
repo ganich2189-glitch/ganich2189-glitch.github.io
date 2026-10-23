@@ -110,6 +110,24 @@ button{font-family:inherit;cursor:pointer}
 .modal{background:var(--card);border:1px solid var(--line2);border-radius:22px;padding:22px;max-width:620px;width:100%;max-height:92vh;overflow:auto;animation:pop .25s}
 .modal h2{margin:0 0 10px;color:var(--num);font-size:22px}
 .modal .opt{display:block;width:100%;margin:8px 0}
+.modal .opt.bad{opacity:.45;border-color:var(--red);text-decoration:line-through}
+.why{margin-top:12px;padding:12px 14px;border:1px solid #ef444466;background:#2a1418;border-radius:12px;font-size:14px;line-height:1.5}
+.why b{color:var(--red2)}
+.fxwin{border:1px solid var(--line2);border-radius:14px;overflow:hidden;background:var(--card3)}
+.fxbar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#15121f;border-bottom:1px solid var(--line2);font-size:13px;color:var(--mut)}
+.fxbar i{width:10px;height:10px;border-radius:50%;background:var(--line2)}.fxbar span{margin-left:8px;font-weight:700;color:var(--acc3)}
+.fxbody{padding:14px}.fxbody h2{font-size:18px!important}
+.fxgoal{font-size:13px;color:var(--mut);margin-bottom:8px}
+.fxpath{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.fxpath span{font-size:12px;padding:4px 8px;border-radius:8px;background:#14281c;color:#86efac;border:1px solid #22c55e44}
+.fxprog{height:6px;background:var(--line2);border-radius:6px;margin-top:12px;overflow:hidden}.fxprog div{height:100%;background:var(--acc);transition:.3s}
+.modal.fr{max-width:900px}.frw{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}@media(max-width:720px){.frw{grid-template-columns:1fr}}
+.frc{position:relative;border:2px solid var(--acc);border-radius:10px;overflow:hidden;background:#0d0b14;aspect-ratio:16/9}.frc canvas{display:block;width:100%!important;height:100%!important;cursor:grab}
+.thirds{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 33%,#ffffff40 33%,#ffffff40 calc(33% + 1px),transparent calc(33% + 1px),transparent 66%,#ffffff40 66%,#ffffff40 calc(66% + 1px),transparent calc(66% + 1px)),linear-gradient(180deg,transparent 33%,#ffffff40 33%,#ffffff40 calc(33% + 1px),transparent calc(33% + 1px),transparent 66%,#ffffff40 66%,#ffffff40 calc(66% + 1px),transparent calc(66% + 1px))}
+.frlive{position:absolute;left:8px;top:6px;font-size:11px;color:var(--acc3);background:#0008;padding:2px 6px;border-radius:6px;pointer-events:none}
+.frno{padding:30px 14px;color:var(--mut);font-size:13px}
+.frs label{display:block;font-size:13px;color:var(--mut);margin-bottom:6px}.frs label b{color:var(--num)}.frs input{width:100%;accent-color:var(--acc)}
+.frt .btn.on{border-color:var(--green);color:#86efac}
+.frq{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin:12px 0;font-size:13px}@media(max-width:720px){.frq{grid-template-columns:1fr}}.frq .ok{color:#86efac}.frq .no{color:var(--red2)}.frq small{display:block;color:var(--mut)}
 .tag{display:inline-block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--red2);margin-bottom:6px}
 label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
 input[type=text]{width:100%;background:#0f0f12;border:1px solid var(--line2);border-radius:12px;padding:11px 12px;color:var(--num);font-size:16px;font-family:inherit}
@@ -181,8 +199,8 @@ var STEPS=[
 {id:"crm",t:"Смена в CRM",h:"Кнопкой «+» открой CRM, найди свою смену и нажми зелёный треугольник — откроются доступы.",w:"Шаг 8: в CRM находишь смену и жмёшь зелёный треугольник, чтобы открылись доступы к сайтам.",need:["tab_crm","crm_triangle"],m:1},
 {id:"login",t:"Вход на сайты",h:"На каждой вкладке сайта войди с логином и паролем из доступов CRM.",w:"Шаг 9: логин и пароль — только из доступов CRM, после зелёного треугольника.",need:["login_sc","login_cb","login_c4","login_jas"],m:1},
 {id:"income",t:"Скрины дохода",h:"На каждом сайте открой доход и сделай скрин, затем загрузи все скрины в окно CRM. «Начать смену» пока не трогаешь.",w:"Шаг 9: скрины дохода со всех сайтов делаются до старта и загружаются в окно CRM.",need:["inc_sc","inc_cb","inc_c4","inc_jas","crm_upload"],last:"crm_upload",m:1},
-{id:"obs",t:"OBS и виртуальная камера",h:"OBS: Stripchat — основной вывод, сервер и ключ с сайта. Chaturbate и Cam4 — в «Множественный вывод». Включи виртуальную камеру и в Jasmin выбери VIRTUAL OBS CAMERA.",w:"Шаг 10: ключи, мультивывод и виртуальная камера настраиваются после скринов и до старта смены.",need:["obs_key_sc","obs_multi_cb","obs_multi_c4","obs_vcam","jas_vcam"],m:1},
-{id:"room",t:"Кадр и раскладка",h:"В OBS, блок «Перед стартом»: кадр, свет, масло, игрушки, вода. Игрушка настроена до старта. Выбери правильную раскладку экрана.",w:"Шаг 11: кадр, свет, игрушка и раскладка экрана проверяются до старта смены.",need:["room_frame","room_light","room_oil","room_toy","room_water","room_layout"],m:1},
+{id:"obs",t:"OBS и виртуальная камера",h:"OBS: ключ Stripchat — только в основной вывод (Настройки → Трансляция → ключ потока), не в мультистриминг. Chaturbate и Cam4 — в «Множественный вывод». Включи виртуальную камеру и в Jasmin выбери VIRTUAL OBS CAMERA.",w:"Шаг 10: ключи, мультивывод и виртуальная камера настраиваются после скринов и до старта смены.",need:["obs_key_sc","obs_multi_cb","obs_multi_c4","obs_vcam","jas_vcam"],m:1},
+{id:"room",t:"Кадр и раскладка",h:"В OBS, блок «Перед стартом»: «Кадр» открывает окно кадра — выставь модель, камеру и свет, пока проверка не станет зелёной. Затем масло, масло, игрушки, вода. Игрушка настроена до старта. Выбери правильную раскладку экрана.",w:"Шаг 11: кадр, свет, игрушка и раскладка экрана проверяются до старта смены.",need:["room_frame","room_light","room_oil","room_toy","room_water","room_layout"],m:1},
 {id:"start",t:"CRM: «Начать смену»",h:"Только сейчас в CRM жмёшь «Начать смену». Время запуска = начало смены.",w:"Шаг 12: «Начать смену» в CRM жмёшь только после скринов дохода, OBS и проверки кадра.",need:["crm_start"],m:1},
 {id:"bots",t:"Боты в доступах",h:"В том же окне CRM нажми «Начать работу» на всех ботах. Окно сворачиваешь до конца смены.",w:"«Начать работу» на ботах — сразу после «Начать смену», в том же окне CRM.",need:["crm_bots"],m:1},
 {id:"stream",t:"Трансляция",h:"Запусти трансляцию в OBS, нажми «Начать» в Jasmin и проверь, что все сайты в онлайне.",w:"Эфир запускается после старта смены в CRM и ботов.",need:["obs_stream","jas_start","check_online"],last:"check_online",m:1},
@@ -196,15 +214,101 @@ trap_jascam:["В Jasmin выбрана вебка напрямую","В Jasmin, 
 trap_layout:["Неверная раскладка экрана","Центр — Chaturbate + Stripchat, лево — Cam4 + CamSoda, право — Jasmin + Flirt4Free."],
 trap_phone:["Время в кружке с телефона","Время в кружках и отчётах — только с вкладки точного МСК."],
 trap_later:["Отчёт «потом»","Отчёт — одним сообщением по шаблону в момент запуска. Не «через 10 минут напишу»."],
+trap_scmulti:["Stripchat добавлен в мультистриминг","Ключ Stripchat вводится только в основной вывод: Файл → Настройки → Трансляция → сервер и ключ потока. В «Множественный вывод» идут только Chaturbate и Cam4. Удали Stripchat из мультивывода и добавь ключ в основной вывод."],
 trap_jasscale:["Доход Jasmin без масштаба","Jasmin: Статистика → Просмотр дохода, масштаб страницы 67%, чтобы были видны обе таблицы: онлайн и офлайн."]
 };
 var INC=[
-{id:"pass",at:"login",q:"Забыл пароль от Chaturbate. Что делаешь?",o:[["Открываю доступы смены в CRM и беру логин и пароль оттуда",1],["Пробую пароли, которые помню, пока не подойдёт",0],["Пишу модели, пусть вспомнит",0]],e:"Логин и пароль — только из доступов CRM."},
-{id:"late",at:"model",q:"Модель не пришла и не отвечает в чате. Что делаешь?",o:[["Звоню модели и сразу пишу продюсеру в П2 К1; если старт сдвинется — причину укажу в отчёте",1],["Жду молча, может придёт",0],["Начинаю смену без модели, кружок отправлю потом",0]],e:"Без кружка модели смена не собрана. Продюсер узнаёт сразу, причина опоздания идёт в отчёт.",cost:7},
-{id:"mic",at:"obs",q:"В микшере OBS нет микрофона. Что делаешь?",o:[["Настройки → Аудио → Микрофон: выбираю устройство и держу уровень в зелёной зоне",1],["Перезагружаю компьютер",0],["Запускаю эфир без звука, разберусь потом",0]],e:"Если микрофона нет: Настройки → Аудио → Микрофон. Уровень — в зелёной зоне."},
-{id:"vcam",after:"jas_vcam",q:"В Jasmin не видно VIRTUAL OBS CAMERA. Что делаешь?",o:[["Проверяю, что виртуальная камера в OBS включена и источник выбран, перезапускаю Jasmin и снова выбираю VIRTUAL OBS CAMERA",1],["Выбираю в Jasmin вебку напрямую",0],["Переустанавливаю OBS",0]],e:"Виртуальная камера включается в OBS с выбранным источником; в Jasmin, Flirt и Cam4 — VIRTUAL OBS CAMERA."},
-{id:"site",after:"obs_stream",q:"OBS в эфире, а Chaturbate висит в «Waiting for stream to start». Что делаешь?",o:[["Проверяю в «Множественном выводе» сервер и ключ Chaturbate — они должны быть с сайта — и перезапускаю этот вывод",1],["Жду, само запустится",0],["Делаю Chaturbate основным выводом вместо Stripchat",0]],e:"Ключ и сервер в мультивыводе берутся с самого сайта. Основной вывод остаётся Stripchat."},
-{id:"bitrate",after:"check_online",q:"Через пару минут после старта падает битрейт. Что делаешь?",o:[["Делаю speedtest, ставлю ближайший сервер вместо автовыбора и регулирую битрейт по нагрузке (Stripchat 2500–5000)",1],["Ставлю битрейт на максимум",0],["Перезапускаю трансляцию каждые 5 минут",0]],e:"Сервер — ближайший, автовыбор часто врёт. Битрейт Stripchat 2500–5000, регулируем по нагрузке."}
+{id:"pass",at:"login",q:"Забыл пароль от Chaturbate. Что делаешь?",o:[
+ ["Открываю доступы смены в CRM и беру логин и пароль оттуда",1],
+ ["Пробую пароли, которые помню, пока не подойдёт",0,"После нескольких неверных попыток Chaturbate блокирует вход и просит подтверждение по почте модели. Это 20–40 минут простоя, а иногда и ручная проверка аккаунта. Подбирать пароли нельзя."],
+ ["Жму «Забыли пароль?» и сбрасываю его",0,"Письмо со сбросом уходит на почту модели, доступа к ней у тебя нет. Плюс после сброса старый пароль в CRM перестанет работать у всех. Пароль не меняем, берём из CRM."],
+ ["Пишу модели, пусть вспомнит",0,"Модель не хранит доступы и не должна их знать или передавать в чате. Пароли в переписке — нарушение безопасности. Единственный источник — доступы смены в CRM."],
+ ["Пишу продюсеру в общую группу, пусть скинет пароль",0,"Пароли в общих чатах не пересылаются: их видит вся группа. Продюсер всё равно отправит тебя в CRM, только ты потеряешь время."]],
+ e:"Логин и пароль — только из доступов CRM.",
+ fix:{app:"Браузер · CRM",goal:"Найди доступы Chaturbate в CRM и войди на сайт",steps:[
+  {t:"Открой вкладку CRM",o:[["Вкладка CRM",1],["Вкладка Chaturbate → «Забыли пароль?»",0,"Сброс пароля нам не нужен. Сначала в CRM."],["Почта модели",0,"Доступа к почте модели у оператора нет."]]},
+  {t:"Перейди к своей смене",o:[["Смены → Моя смена (сегодня)",1],["Отчёты",0,"В отчётах доступов нет. Доступы привязаны к смене."],["Профиль оператора",0,"В профиле только твои данные. Нужна карточка смены."]]},
+  {t:"Открой доступы смены",o:[["Вкладка «Доступы»",1],["Вкладка «Скрины дохода»",0,"Скрины будут позже, на шаге 9. Сейчас — «Доступы»."],["Кнопка «Начать смену»",0,"Смену стартуем только в "+fmt(SHIFT)+" и после всей подготовки."]]},
+  {t:"Возьми логин и пароль Chaturbate",o:[["Chaturbate → «Копировать логин» и «Копировать пароль»",1],["Stripchat → «Копировать пароль»",0,"Это доступы другого сайта. Нужна строка Chaturbate."],["Переписать пароль от руки в заметки",0,"Пароль не хранится в заметках. Только копирование из CRM."]]},
+  {t:"Войди на Chaturbate",o:[["Вкладка Chaturbate → вставить логин и пароль → «Log in»",1],["«Remember me» и сохранить пароль в браузере на всякий",0,"Не сохраняем пароли в браузере — CRM и так под рукой."],["Войти через Google",0,"Аккаунт студии не привязан к Google. Вход по логину и паролю из CRM."]]}]}},
+{id:"late",at:"model",q:"Модель не пришла и не отвечает в чате. Что делаешь?",o:[
+ ["Звоню модели и сразу пишу продюсеру в П2 К1; если старт сдвинется — причину укажу в отчёте",1],
+ ["Жду молча, может придёт",0,"Продюсер должен узнать сразу, а не после срыва. Молчание = потерянные минуты, которые никто не успел закрыть заменой или переносом."],
+ ["Начинаю смену без модели, кружок отправлю потом",0,"Без кружка с моделью смена не собрана. Пустой эфир на сайтах — минус рейтинг и штрафы платформ, а «потом» в кружке будет неверное время."],
+ ["Пишу модели 10 сообщений подряд и жду ответа",0,"Сообщения она уже не читает. Нужен звонок, и параллельно — продюсер. Одна переписка ничего не решает."],
+ ["Ухожу домой, раз модели нет",0,"Смену может закрыть только продюсер. Оператор остаётся на месте, сообщает и ждёт решения."]],
+ e:"Без кружка модели смена не собрана. Продюсер узнаёт сразу, причина опоздания идёт в отчёт.",cost:7,
+ fix:{app:"Telegram",goal:"Свяжись с моделью и предупреди продюсера",steps:[
+  {t:"Сначала позвони модели",o:[["Чат с моделью → ☎ Позвонить",1],["Чат с моделью → ещё одно сообщение «ты где?»",0,"Сообщения она не читает. Звонок."],["Группа П2 К1 → стикер",0,"Сначала звонок модели, потом текст продюсеру — по делу."]]},
+  {t:"Модель не берёт трубку. Куда пишешь?",o:[["Группа "+GROUP+" → продюсеру",1],["Личка другой модели",0,"Другие модели не решают вопрос со сменой. Пишешь продюсеру в группу."],["Чат операторов, «у кого так было?»",0,"Нужно решение продюсера, а не советы."]]},
+  {t:"Что пишешь продюсеру?",o:[["«"+PROD+", модель не на месте, не отвечает, звоню. Время по точному МСК: сейчас»",1],["«Модели нет»",0,"Мало фактов: не ясно, звонил ли ты и с какого времени её нет."],["«Похоже, сегодня смены не будет»",0,"Решение принимает продюсер. Ты сообщаешь факты."]]},
+  {t:"Модель перезвонила: будет через 7 минут. Что дальше?",o:[["Сообщаю продюсеру новое время и записываю причину опоздания для отчёта",1],["Ничего не пишу, раз всё равно придёт",0,"Продюсер должен знать, что старт сдвигается."],["Ставлю в кружок время с телефона",0,"Время — только с вкладки точного МСК."]]}]}},
+{id:"mic",at:"obs",q:"В микшере OBS нет микрофона. Что делаешь?",o:[
+ ["Настройки → Аудио → Микрофон: выбираю устройство и держу уровень в зелёной зоне",1],
+ ["Перезагружаю компьютер",0,"Перезагрузка — 5–7 минут, после неё браузер и OBS придётся поднимать заново. А устройство в OBS так и останется «Отключено». Причина в настройках, не в ПК."],
+ ["Запускаю эфир без звука, разберусь потом",0,"Эфир без звука — зрители сразу уходят, а сайт роняет комнату в выдаче. Звук проверяется до старта."],
+ ["Добавляю «Захват выходного звука» вместо микрофона",0,"Это звук компьютера, а не голос модели. В эфир пойдут системные звуки, а модели слышно не будет."],
+ ["Выкручиваю громкость микрофона в Windows на 100%",0,"Если в OBS микрофон не выбран, громкость Windows не поможет. А на 100% будет перегруз и хрип в красной зоне."]],
+ e:"Если микрофона нет: Настройки → Аудио → Микрофон. Уровень — в зелёной зоне.",
+ fix:{app:"OBS Studio",goal:"Верни микрофон в микшер и выставь уровень",steps:[
+  {t:"Открой настройки OBS",o:[["Файл → Настройки",1],["Сцена → Фильтры",0,"Фильтры не выбирают устройство. Нужны общие настройки."],["Инструменты → Автонастройка",0,"Мастер автонастройки меняет вывод и битрейт, а не микрофон."]]},
+  {t:"Раздел с устройствами звука",o:[["Аудио",1],["Вывод",0,"«Вывод» — это битрейт и кодировщик. Микрофон — в «Аудио»."],["Видео",0,"Это разрешение и FPS."]]},
+  {t:"Поле «Микрофон / доп. аудио»: сейчас «Отключено». Что выбрать?",o:[["Микрофон (USB Audio Device)",1],["По умолчанию",0,"«По умолчанию» может взять вебку или гарнитуру. Выбираем конкретный микрофон."],["Стерео микшер",0,"Это звук ПК, а не голос."]]},
+  {t:"Сохрани",o:[["Применить → ОК",1],["Закрыть крестиком",0,"Без «Применить» настройки не сохранятся."]]},
+  {t:"Микрофон появился в микшере. Модель говорит — какой уровень?",o:[["Ползунок так, чтобы пики были в зелёной зоне (около −20…−10 dB)",1],["В красную, чтобы было громче",0,"Красная зона — перегруз и хрип."],["Почти на ноль, чтобы не шумело",0,"Зрители не услышат модель. Нужна зелёная зона."]]}]}},
+{id:"vcam",after:"jas_vcam",q:"В Jasmin не видно VIRTUAL OBS CAMERA. Что делаешь?",o:[
+ ["Проверяю, что виртуальная камера в OBS включена и источник выбран, перезапускаю Jasmin и снова выбираю VIRTUAL OBS CAMERA",1],
+ ["Выбираю в Jasmin вебку напрямую",0,"Тогда Jasmin заберёт вебку себе: в OBS картинка пропадёт на всех остальных сайтах, и пропадут сцены и оверлеи. Только VIRTUAL OBS CAMERA."],
+ ["Переустанавливаю OBS",0,"Это 15+ минут и сброс профилей, ключей и мультивывода. Проблема почти всегда в том, что виртуальная камера просто не запущена."],
+ ["Жду, пока камера сама появится в списке",0,"Jasmin читает список камер при запуске. Пока OBS не включит виртуальную камеру и Jasmin не перезапустить, она не появится."],
+ ["Запускаю Jasmin без камеры, только со звуком",0,"Jasmin без видео — это пустой эфир, сайт снимет комнату из выдачи. Камера обязательна."]],
+ e:"Виртуальная камера включается в OBS с выбранным источником; в Jasmin, Flirt и Cam4 — VIRTUAL OBS CAMERA.",
+ fix:{app:"OBS Studio → Jasmin",goal:"Запусти виртуальную камеру и подключи её в Jasmin",steps:[
+  {t:"В OBS: что проверяешь первым?",o:[["Панель «Управление» → «Запустить виртуальную камеру»",1],["Начать запись",0,"Запись не создаёт камеру."],["Начать трансляцию ещё раз",0,"Трансляция уже идёт; виртуальная камера включается отдельно."]]},
+  {t:"Что пойдёт в виртуальную камеру?",o:[["Тип вывода: «Программа» (основная сцена)",1],["Тип вывода: «Источник» → вебка напрямую",0,"Без сцены пропадут оверлеи. Выводим программу."],["Тип вывода: «Предпросмотр»",0,"В предпросмотре может быть не то, что в эфире."]]},
+  {t:"Перезапусти Jasmin",o:[["Закрыть Jasmin полностью (и из трея) → открыть снова",1],["Свернуть и развернуть окно",0,"Список камер так не обновится. Нужен полный перезапуск."],["Перезагрузить ПК",0,"Слишком долго. Хватит перезапуска Jasmin."]]},
+  {t:"Jasmin → Источник камеры",o:[["VIRTUAL OBS CAMERA",1],["Lovense Webcam 2",0,"Вебку напрямую не выбираем."],["OBS-Camera (старая)",0,"Это устаревший плагин. Нужна VIRTUAL OBS CAMERA."]]}]}},
+{id:"site",after:"obs_stream",q:"OBS в эфире, а Chaturbate висит в «Waiting for stream to start». Что делаешь?",o:[
+ ["Проверяю в «Множественном выводе» сервер и ключ Chaturbate — они должны быть с сайта — и перезапускаю этот вывод",1],
+ ["Жду, само запустится",0,"Если через 30–60 секунд сигнала нет, сам он не появится: OBS шлёт поток не туда или со старым ключом. Каждая минута — потерянный онлайн."],
+ ["Делаю Chaturbate основным выводом вместо Stripchat",0,"Основной вывод — Stripchat, база студии. Перекинешь основной — сломается Stripchat, а ошибка с ключом Chaturbate никуда не денется."],
+ ["Останавливаю всю трансляцию в OBS и запускаю заново",0,"Это уронит Stripchat и остальные сайты ради одного. Перезапускается только нужный вывод в мультивыводе."],
+ ["Обновляю страницу Chaturbate много раз",0,"Страница лишь показывает статус. Если ключ неверный, обновление не поможет."]],
+ e:"Ключ и сервер в мультивыводе берутся с самого сайта. Основной вывод остаётся Stripchat.",
+ fix:{app:"Chaturbate → OBS · Множественный вывод",goal:"Обнови ключ Chaturbate в мультивыводе и перезапусти только этот вывод",steps:[
+  {t:"Где взять актуальный ключ?",o:[["Вкладка Chaturbate → Broadcast → «Use external software» → Copy stream key",1],["Ключ из прошлой смены в заметках",0,"Ключ мог обновиться. Только с сайта."],["Ключ Stripchat",0,"У каждого сайта свой ключ."]]},
+  {t:"Открой мультивывод в OBS",o:[["OBS → док «Множественный вывод»",1],["Настройки → Трансляция",0,"Там основной вывод — Stripchat. Его не трогаем."],["Настройки → Вывод",0,"Там битрейт, а ключи — в мультивыводе."]]},
+  {t:"Сначала останови нужный вывод",o:[["Chaturbate → «Стоп»",1],["«Остановить все»",0,"Уронит все сайты. Только Chaturbate."],["Stripchat → «Стоп»",0,"Stripchat работает, не трогаем."]]},
+  {t:"Исправь цель",o:[["Chaturbate → Изменить → вставить сервер и ключ с сайта → Сохранить",1],["Удалить цель Chaturbate",0,"Тогда придётся заново настраивать кодировщик. Достаточно изменить ключ."],["Поменять битрейт",0,"Битрейт ни при чём — неверный ключ."]]},
+  {t:"Запусти снова",o:[["Chaturbate → «Старт» и проверить, что на сайте пошла картинка",1],["Начать трансляцию в основном окне OBS",0,"Основная уже идёт. Стартуем только вывод Chaturbate."]]}]}},
+{id:"banner",after:"check_online",q:"Идёт эфир на Stripchat, и появляется жёлтая плашка «У вас проблема с трансляцией». Что делаешь?",o:[
+ ["В основном выводе, где добавлен Stripchat, меняю кодировщик и ставлю профиль baseline, затем перезапускаю трансляцию",1],
+ ["Перезапускаю OBS",0,"После перезапуска OBS поднимет те же настройки кодировщика, и плашка вернётся через минуту. А ты уронишь эфир на всех сайтах сразу."],
+ ["Снижаю разрешение до 720p",0,"Плашка не про разрешение. Stripchat не принимает поток с таким кодировщиком и профилем, и с 720p будет то же самое, только картинка хуже."],
+ ["Меняю сервер Stripchat на другой",0,"Сервер влияет на скорость и потери кадров. Плашка «проблема с трансляцией» при стабильном битрейте — это формат потока, то есть кодировщик и профиль."],
+ ["Переподключаю интернет",0,"Разорвёшь все выводы, а при той же настройке кодировщика ошибка останется. Сначала смотрим, что именно отдаём на Stripchat."]],
+ e:"Плашка «У вас проблема с трансляцией» на Stripchat: в основном выводе меняем кодировщик и ставим профиль baseline, потом перезапуск трансляции.",
+ fix:{app:"OBS Studio · Настройки → Вывод",goal:"Исправь кодировщик и профиль в основном выводе Stripchat",steps:[
+  {t:"Открой настройки OBS",o:[["Файл → Настройки",1],["Док «Множественный вывод»",0,"Stripchat — основной вывод, он настраивается в общих настройках, а не в мультивыводе."],["Сцена → Фильтры",0,"Фильтры не меняют кодировщик."]]},
+  {t:"Нужный раздел",o:[["Вывод",1],["Трансляция",0,"Там сервер и ключ. Кодировщик — в «Вывод»."],["Видео",0,"Там разрешение и FPS, кодировщика нет."]]},
+  {t:"Какой вывод правим?",o:[["Вкладка «Потоковое вещание» — основной вывод (Stripchat)",1],["Вкладка «Запись»",0,"Запись не идёт на сайт. Правим потоковое вещание."],["Цель Chaturbate в мультивыводе",0,"Плашка на Stripchat, а он в основном выводе."]]},
+  {t:"Кодировщик сейчас «NVIDIA NVENC HEVC». Меняй на:",o:[["NVIDIA NVENC H.264",1],["NVIDIA NVENC AV1",0,"AV1 Stripchat тоже не принимает. Нужен H.264."],["Оставить как есть",0,"С этим кодировщиком плашка не уйдёт."]]},
+  {t:"Профиль",o:[["baseline",1],["high",0,"С high Stripchat и показывает плашку. Нужен baseline."],["main",0,"Нужен именно baseline."]]},
+  {t:"Сохрани",o:[["Применить → ОК",1],["Закрыть крестиком",0,"Без «Применить» настройки не сохранятся."]]},
+  {t:"Настройки сохранены, но поток ещё старый. Дальше:",o:[["«Остановить трансляцию» → «Начать трансляцию», проверить, что плашка на Stripchat исчезла",1],["Ничего, само подхватится",0,"Новый кодировщик включится только после перезапуска трансляции."],["Перезапустить ПК",0,"Хватит перезапуска трансляции в OBS."]]}]}},
+{id:"bitrate",after:"check_online",q:"Через пару минут после старта падает битрейт. Что делаешь?",o:[
+ ["Делаю speedtest, ставлю ближайший сервер вместо автовыбора и регулирую битрейт по нагрузке (Stripchat 2500–5000)",1],
+ ["Ставлю битрейт на максимум",0,"Если канал не тянет, высокий битрейт только усилит потери кадров: картинка начнёт рассыпаться и зависать на всех сайтах сразу."],
+ ["Перезапускаю трансляцию каждые 5 минут",0,"Каждый перезапуск — разрыв эфира, зрители уходят, комната падает в выдаче. А причина (сервер и битрейт) остаётся."],
+ ["Снижаю разрешение до 480p и больше не трогаю",0,"Картинка станет мыльной, и на Stripchat это прямой минус в выдаче. Сначала сервер и битрейт в пределах 2500–5000."],
+ ["Закрываю Jasmin и Cam4, чтобы освободить канал",0,"Это отключит сайты и потерю дохода. Решается сервером и битрейтом, а не выключением площадок."]],
+ e:"Сервер — ближайший, автовыбор часто врёт. Битрейт Stripchat 2500–5000, регулируем по нагрузке.",
+ fix:{app:"Speedtest → OBS · Настройки",goal:"Замерь канал, выбери ближайший сервер и выставь битрейт",steps:[
+  {t:"Замерь скорость",o:[["Новая вкладка → speedtest.net → «Сменить сервер» → ближайший → GO",1],["speedtest с автовыбором сервера",0,"Автовыбор часто берёт далёкий сервер и врёт. Выбираем ближайший вручную."],["Спросить скорость у соседа-оператора",0,"У каждого ПК свой канал. Замер — свой."]]},
+  {t:"Отдача 9 Мбит/с. Куда в OBS?",o:[["Файл → Настройки → Трансляция",1],["Фильтры источника",0,"Фильтры не меняют сервер."],["Настройки → Аудио",0,"Звук не влияет на падение битрейта."]]},
+  {t:"Сервер Stripchat",o:[["Сменить «Авто» на ближайший сервер (Европа)",1],["Оставить «Авто»",0,"Автовыбор часто цепляет далёкий сервер. Ставим ближайший."],["Сервер из США",0,"Далёкий сервер — больше потерь."]]},
+  {t:"Настройки → Вывод → Битрейт видео",o:[["4000 Kbps",1],["8000 Kbps",0,"Выше лимита Stripchat (5000) и почти весь канал. Будут потери кадров."],["1500 Kbps",0,"Ниже минимума 2500 — картинка будет мыльной."]]},
+  {t:"Сохрани и проверь",o:[["Применить → ОК → в статус-баре OBS нет красного, потерь кадров 0%",1],["Закрыть без «Применить»",0,"Настройки не сохранятся."]]}]}}
 ];
 var WINS={desk:["Рабочий стол","#3b3b45","⌂"],br:["Браузер","#2563eb","G"],tg:["Telegram","#0ea5e9","T"],obs:["OBS Studio","#6d28d9","O"],jas:["Jasmin","#db2777","J"]};
 var SITES={sc:["Stripchat","#ef4444"],cb:["Chaturbate","#f97316"],c4:["Cam4","#06b6d4"],jas:["Jasmin","#db2777"],msk:["Точное МСК","#22c55e"],crm:["CRM","#8b5cf6"]};
@@ -275,19 +379,119 @@ function onStep(){
 }
 function checkAfter(a){INC.forEach(function(x){if(x.after===a)queueInc(x)});showNext()}
 function queueInc(x){if(S.incPlan.indexOf(x.id)<0)return;if(S.incShown.indexOf(x.id)>=0)return;S.incShown.push(x.id);S.queue.push(x);setTimeout(showNext,500)}
-function showNext(){if(S.modal||!S.queue.length||S.over)return;var x=S.queue.shift();S.modal=true;
-  var opts=x.o.slice().sort(function(){return Math.random()-.5});
+function showNext(){if(S.modal||!S.queue.length||S.over)return;var x=S.queue.shift();S.modal=true;S.incWrong={};
+  S.incOrder=x.o.map(function(o,i){return i}).sort(function(){return Math.random()-.5});drawInc(x,null);
+}
+function drawInc(x,picked){
   var h='<div class="modal"><span class="tag">Инцидент · '+fmt(S.clock)+' МСК</span><h2>'+x.q+'</h2>';
-  opts.forEach(function(o,i){h+='<button class="btn opt" data-inc="'+x.id+'" data-ok="'+o[1]+'">'+String.fromCharCode(65+i)+'. '+o[0]+'</button>'});
+  S.incOrder.forEach(function(k,i){var o=x.o[k];var w=S.incWrong[k];h+='<button class="btn opt'+(w?' bad':'')+'" data-inc="'+x.id+'" data-k="'+k+'"'+(w?' disabled':'')+'>'+String.fromCharCode(65+i)+'. '+o[0]+'</button>'});
+  if(picked!=null){h+='<div class="why"><b>Неверно.</b> '+x.o[picked][2]+'<br><span class="rule">Выбери другой вариант.</span></div>'}
   h+='</div>';ov(h);
 }
-function incAnswer(id,ok){var x=INC.filter(function(y){return y.id===id})[0];S.modal=false;closeOv();
-  if(ok==="1"){S.score+=20;S.clock+=2;addLog("+20 · инцидент решён",true);toast("+20 · верно: "+x.e,true)}
-  else{S.modal=false;var p=S.mode==="pro"?25:15;S.score-=p;S.clock+=5;S.mist.push({t:"Инцидент: "+x.q,e:x.e,at:fmt(S.clock)});addLog("−"+p+" · инцидент",false);toast("Неверно: "+x.e,false)}
+function incAnswer(id,k){var x=INC.filter(function(y){return y.id===id})[0];k=+k;
+  if(x.o[k][1]===1){S.score+=20;S.clock+=2;addLog("+20 · верное решение: "+x.q,true);toast("+20 · верно. Теперь исправь на практике",true);startFix(x);return}
+  if(S.incWrong[k])return;S.incWrong[k]=1;
+  var p=S.mode==="pro"?25:15;S.score-=p;S.clock+=3;S.mist.push({t:"Инцидент: "+x.o[k][0],e:x.o[k][2]+" Верно: "+x.e,at:fmt(S.clock)});addLog("−"+p+" · инцидент",false);
+  drawInc(x,k);
+}
+function startFix(x){S.fx={x:x,i:0,bad:{},hint:null,ord:null};drawFix()}
+function drawFix(){var F=S.fx,x=F.x,st=x.fix.steps[F.i];
+  if(!F.ord)F.ord=st.o.map(function(o,i){return i}).sort(function(){return Math.random()-.5});
+  var h='<div class="modal fx"><span class="tag" style="color:var(--acc2)">Исправление · шаг '+(F.i+1)+' из '+x.fix.steps.length+'</span>';
+  h+='<div class="fxwin"><div class="fxbar"><i></i><i></i><i></i><span>'+x.fix.app+'</span></div><div class="fxbody">';
+  h+='<div class="fxgoal">'+x.fix.goal+'</div><div class="fxpath">';
+  for(var j=0;j<F.i;j++){var ok=x.fix.steps[j].o.filter(function(o){return o[1]===1})[0];h+='<span>✓ '+ok[0]+'</span>'}
+  h+='</div><h2>'+st.t+'</h2>';
+  F.ord.forEach(function(k){var o=st.o[k];var b=F.bad[k];h+='<button class="btn opt'+(b?' bad':'')+((S.mode==="nov"&&o[1]===1&&Object.keys(F.bad).length>=2)?' hl':'')+'" data-fx="'+k+'"'+(b?' disabled':'')+'>'+o[0]+'</button>'});
+  if(F.hint)h+='<div class="why"><b>Не то.</b> '+F.hint+'</div>';
+  h+='</div></div><div class="fxprog"><div style="width:'+Math.round(100*F.i/x.fix.steps.length)+'%"></div></div></div>';ov(h);
+}
+function fixClick(k){var F=S.fx;if(!F)return;k=+k;var st=F.x.fix.steps[F.i],o=st.o[k];
+  if(o[1]===1){S.score+=5;S.clock+=1;F.i++;F.bad={};F.hint=null;F.ord=null;
+    if(F.i>=F.x.fix.steps.length){endFix();return}
+    drawFix();return}
+  if(F.bad[k])return;F.bad[k]=1;F.hint=o[2];var p=S.mode==="pro"?5:3;S.score-=p;addLog("−"+p+" · исправление: "+o[0],false);drawFix();
+}
+function endFix(){var x=S.fx.x;S.fx=null;S.modal=false;closeOv();
+  addLog("✓ Исправлено: "+x.q,true);toast("+5 за каждый шаг · исправлено. Смена продолжается",true);
   if(x.cost)S.clock+=x.cost;
   render();setTimeout(showNext,400);
   if(!STEPS[S.idx])finish();
 }
+function openFrame(){S.modal=true;S.fr={mx:-1.6,px:0.8,cy:1.6,fov:75,yaw:18,key:0,kb:1.2,kt:3000,fill:0,fb:0.5,exp:1.6};
+  var R=[["mx","Модель: позиция","-2.5","2.5","0.05"],["px","Камера: сдвиг","-2","2","0.05"],["cy","Камера: высота","0.6","2.6","0.05"],["fov","Зум (угол обзора)","30","90","1"],["yaw","Поворот камеры","-40","40","1"],["kb","Ключевой свет: яркость","0","2","0.05"],["kt","Цветовая температура, K","2700","7500","100"],["fb","Заполняющий свет: яркость","0","1.5","0.05"],["exp","Экспозиция","0.4","2.4","0.05"]];
+  var h='<div class="modal fr"><span class="tag" style="color:var(--acc2)">OBS · окно кадра</span><h2>Выставь кадр и свет</h2><div class="frw"><div class="frc" id="frc"><div class="thirds"></div><span class="frlive">Превью · Сцена «Основная»</span></div><div class="frs">';
+  h+='<div class="frt"><button class="btn" data-fr="key">💡 Ключевой: выкл</button><button class="btn" data-fr="fill">💡 Заполняющий: выкл</button></div>';
+  R.forEach(function(r){h+='<label>'+r[1]+' <b id="v_'+r[0]+'"></b><input type="range" id="r_'+r[0]+'" min="'+r[2]+'" max="'+r[3]+'" step="'+r[4]+'" value="'+S.fr[r[0]]+'"></label>'});
+  h+='</div></div><div class="frq" id="frq"></div><p class="rule">Модель можно двигать пальцем или мышью прямо в превью.</p><button class="btn pri" id="frok" disabled>Кадр готов</button></div>';
+  ov(h);
+  R.forEach(function(r){$("r_"+r[0]).addEventListener("input",function(e){S.fr[r[0]]=+e.target.value;frUpd()})});
+  frInit();frUpd();
+}
+var FR3=null;
+function frInit(){var c=$("frc");
+  function go(){var T=window.THREE;try{
+    var ren=new T.WebGLRenderer({antialias:true});ren.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+    ren.toneMapping=T.ACESFilmicToneMapping;c.insertBefore(ren.domElement,c.firstChild);
+    var sc=new T.Scene();sc.background=new T.Color(0x0d0b14);
+    var cam=new T.PerspectiveCamera(60,16/9,0.1,50);
+    var M=function(col){return new T.MeshStandardMaterial({color:col,roughness:.8})};
+    var room=new T.Mesh(new T.BoxGeometry(10,4,8),new T.MeshStandardMaterial({color:0x2a2438,side:T.BackSide,roughness:1}));room.position.set(0,2,0);sc.add(room);
+    var bed=new T.Mesh(new T.BoxGeometry(3.2,.5,1.8),M(0x4c3a6b));bed.position.set(0,.25,-2);sc.add(bed);
+    var hb=new T.Mesh(new T.BoxGeometry(3.4,1.4,.2),M(0x332a48));hb.position.set(0,.7,-3);sc.add(hb);
+    var pl=new T.Mesh(new T.BoxGeometry(.9,.25,.5),M(0xd8d0e8));pl.position.set(-.9,.6,-2.5);sc.add(pl);
+    var pic=new T.Mesh(new T.PlaneGeometry(1.6,1),new T.MeshStandardMaterial({color:0x6d28d9,emissive:0x2a1060}));pic.position.set(2.5,2.3,-3.95);sc.add(pic);
+    var fig=new T.Group(),sk=M(0xc9a48a),cl=M(0x8b5cf6);
+    var body=new T.Mesh(new T.CylinderGeometry(.28,.32,1.1,20),cl);body.position.y=1.15;fig.add(body);
+    var head=new T.Mesh(new T.SphereGeometry(.22,24,16),sk);head.position.y=1.95;fig.add(head);
+    var hair=new T.Mesh(new T.SphereGeometry(.24,24,16,0,6.3,0,1.6),M(0x2b1b14));hair.position.y=1.99;fig.add(hair);
+    var legs=new T.Mesh(new T.CylinderGeometry(.3,.22,.7,20),M(0x3b2f55));legs.position.y=.55;fig.add(legs);
+    fig.position.z=-1.6;sc.add(fig);
+    var amb=new T.AmbientLight(0xffffff,.25);sc.add(amb);
+    var key=new T.SpotLight(0xffffff,0,0,.7,.5,0);key.position.set(-2,3.2,1.5);key.target=fig;sc.add(key);
+    var fill=new T.PointLight(0xffffff,0,0,0);fill.position.set(2.5,2,1.5);sc.add(fill);
+    FR3={T:T,ren:ren,sc:sc,cam:cam,fig:fig,head:head,key:key,fill:fill};
+    var drag=false;ren.domElement.style.touchAction="none";
+    ren.domElement.addEventListener("pointerdown",function(e){drag=true;ren.domElement.setPointerCapture(e.pointerId)});
+    ren.domElement.addEventListener("pointerup",function(){drag=false});
+    ren.domElement.addEventListener("pointermove",function(e){if(!drag)return;S.fr.mx=Math.max(-2.5,Math.min(2.5,S.fr.mx+e.movementX*.01));$("r_mx").value=S.fr.mx;frUpd()});
+    frUpd();
+  }catch(err){FR3=null;c.insertAdjacentHTML("afterbegin",'<div class="frno">3D-превью недоступно на этом устройстве — настрой по ползункам и проверке ниже.</div>')}}
+  if(window.THREE)go();else{var s=document.createElement("script");s.src="https://unpkg.com/three@0.160.0/build/three.min.js";s.onload=go;s.onerror=function(){c.insertAdjacentHTML("afterbegin",'<div class="frno">3D-превью не загрузилось — настрой по ползункам и проверке ниже.</div>')};document.head.appendChild(s)}
+}
+function kelvin(k){var t=k/100,r,g,b;if(t<=66){r=255;g=99.47*Math.log(t)-161.1;b=t<=19?0:138.5*Math.log(t-10)-305}else{r=329.7*Math.pow(t-60,-.1332);g=288.1*Math.pow(t-60,-.0755);b=255}function c(x){return Math.max(0,Math.min(255,x))/255}return [c(r),c(g),c(b)]}
+function frProj(){var F=S.fr,yaw=F.yaw*Math.PI/180;
+  // camera at (px,cy,3) looking along -z rotated by yaw
+  var cx=F.px,cy=F.cy,cz=3,f=1/Math.tan(F.fov*Math.PI/360);
+  function p(x,y,z){var dx=x-cx,dy=y-cy,dz=z-cz;var rx=dx*Math.cos(yaw)+dz*Math.sin(yaw),rz=-dx*Math.sin(yaw)+dz*Math.cos(yaw);var d=-rz;return [f*rx/d/(16/9),f*dy/d]}
+  return {head:p(F.mx,2.2,-1.6),chin:p(F.mx,1.75,-1.6),hip:p(F.mx,.9,-1.6),feet:p(F.mx,.2,-1.6)}}
+function frCheck(){var F=S.fr,P=frProj(),r=[];
+  var inX=function(q){return Math.abs(q[0])<.95},cxv=P.hip[0];
+  r.push([Math.abs(cxv)<.22&&inX(P.head),"Модель в центре кадра","Сдвинь модель или камеру: модель должна стоять по центру, а не у края."]);
+  r.push([P.head[1]<.92&&P.chin[1]>.2&&P.chin[1]<.75,"Лицо в верхней трети, голова не обрезана",P.head[1]>=.92?"Голова обрезана сверху: опусти камеру или уменьши зум.":"Глаза и лицо — на верхней линии сетки третей. Подними/опусти камеру."]);
+  var hgt=P.head[1]-P.hip[1];r.push([hgt>.8&&hgt<1.7,"Модель крупно (от головы до бёдер в кадре)",hgt<=.8?"Модель слишком мелкая — приблизь (меньше угол обзора).":"Слишком крупно — бёдра вылезли за кадр, отдали зум."]);
+  r.push([Math.abs(F.yaw)<=12,"Камера смотрит прямо","Сильный угол поворота — выровняй камеру (±12°)."]);
+  r.push([F.key&&F.fill,"Включены ключевой и заполняющий свет","Включи оба источника: ключевой спереди-сбоку и заполняющий, чтобы убрать тени."]);
+  var L=(.25+(F.key?F.kb:0)*.6+(F.fill?F.fb:0)*.5)*F.exp;
+  r.push([L>.95&&L<1.45,"Экспозиция в норме",L<=.95?"Темно — добавь яркость света или экспозицию.":"Пересвет — лицо «выгорает». Убавь свет или экспозицию."]);
+  r.push([F.fill?F.fb<F.kb*.85:true,"Заполняющий слабее ключевого","Заполняющий свет должен быть слабее ключевого, иначе картинка плоская."]);
+  r.push([F.kt>=4800&&F.kt<=6000,"Баланс белого 4800–6000 K",F.kt<4800?"Слишком жёлто — подними температуру.":"Слишком синё — опусти температуру."]);
+  return r}
+function frUpd(){var F=S.fr;if(!F)return;
+  ["mx","px","cy","fov","yaw","kb","kt","fb","exp"].forEach(function(k){var v=$("v_"+k);if(v)v.textContent=F[k];var r=$("r_"+k);if(r&&+r.value!==F[k])r.value=F[k]});
+  var kb=document.querySelector('[data-fr="key"]'),fb=document.querySelector('[data-fr="fill"]');
+  if(kb){kb.textContent="💡 Ключевой: "+(F.key?"вкл":"выкл");kb.classList.toggle("on",!!F.key)}if(fb){fb.textContent="💡 Заполняющий: "+(F.fill?"вкл":"выкл");fb.classList.toggle("on",!!F.fill)}
+  var r=frCheck(),ok=r.every(function(x){return x[0]});
+  var q="";r.forEach(function(x){q+='<div class="'+(x[0]?"ok":"no")+'">'+(x[0]?"✓ ":"✗ ")+x[1]+(x[0]?"":'<small>'+x[2]+'</small>')+'</div>'});
+  if($("frq"))$("frq").innerHTML=q;if($("frok"))$("frok").disabled=!ok;
+  var G=FR3;if(!G||!$("frc"))return;var c=$("frc"),w=c.clientWidth;G.ren.setSize(w,w*9/16);
+  G.cam.fov=F.fov;G.cam.position.set(F.px,F.cy,3);G.cam.rotation.set(0,F.yaw*Math.PI/180,0);G.cam.updateProjectionMatrix();
+  G.fig.position.x=F.mx;var col=kelvin(F.kt);G.key.color.setRGB(col[0],col[1],col[2]);G.key.intensity=F.key?F.kb*6:0;G.fill.intensity=F.fill?F.fb*4:0;
+  G.ren.toneMappingExposure=F.exp;G.ren.render(G.sc,G.cam);
+}
+function frDone(){if(!frCheck().every(function(x){return x[0]}))return;S.fr=null;if(FR3){FR3.ren.dispose();FR3=null}S.modal=false;closeOv();toast("Кадр и свет выставлены",true);act("room_frame");act("room_light")}
+window.__frame={set:function(o){for(var k in o)S.fr[k]=o[k];frUpd()},check:function(){return frCheck()},three:function(){return !!FR3}};
+
 function ov(h){var o=$("ov");o.innerHTML=h;o.classList.remove("hide")}
 function closeOv(){$("ov").classList.add("hide");$("ov").innerHTML=""}
 function openReport(){S.modal=true;
@@ -412,8 +616,8 @@ function obsBody(){
   h+='<div class="grid2" style="margin-top:10px"><div class="dock"><h5>Сцены</h5>Смена</div><div class="dock"><h5>Источники</h5>Камера Lovense<br>Оверлей Lovense</div></div>';
   h+='<div class="dock"><h5>Микшер аудио · Микрофон</h5><div class="meter"><i></i></div></div>';
   h+='<div class="dock"><h5>Перед стартом</h5>'+B("room_frame","Кадр")+B("room_light","Свет")+B("room_oil","Масло")+B("room_toy","Игрушка настроена")+B("room_water","Вода")+'<div class="rule" style="margin-top:6px">Раскладка экрана:</div>'+B("trap_layout","Центр: Jasmin + Flirt4Free · лево: CB + SC")+B("room_layout","Центр: CB + Stripchat · лево: Cam4 + CamSoda · право: Jasmin + Flirt4Free")+'</div></div><div>';
-  h+='<div class="dock"><h5>Вывод · основной</h5>'+B("obs_key_sc","Stripchat: сервер и ключ с сайта")+B("trap_cbmain","Chaturbate основным")+'</div>';
-  h+='<div class="dock"><h5>Множественный вывод</h5>'+B("obs_multi_cb","+ Chaturbate (сервер и ключ с сайта)")+B("obs_multi_c4","+ Cam4 (сервер и ключ с сайта)")+'</div>';
+  h+='<div class="dock"><h5>Вывод · основной</h5>'+B("obs_key_sc","Настройки → Трансляция: Stripchat, сервер и ключ потока с сайта")+B("trap_cbmain","Chaturbate основным")+'</div>';
+  h+='<div class="dock"><h5>Множественный вывод</h5>'+B("trap_scmulti","+ Stripchat (ключ в мультивывод)")+B("obs_multi_cb","+ Chaturbate (сервер и ключ с сайта)")+B("obs_multi_c4","+ Cam4 (сервер и ключ с сайта)")+'</div>';
   h+='<div class="dock"><h5>Управление</h5>'+B("obs_vcam",has("obs_vcam")?"Виртуальная камера включена":"Запустить виртуальную камеру")+B("obs_stream",live?"Трансляция идёт":"Запустить трансляцию","pri")+B("check_online","Проверить, что все сайты в онлайне")+'</div></div></div>';
   return h;
 }
@@ -431,7 +635,11 @@ document.addEventListener("click",function(e){
   if(t.hasAttribute("data-lvl")){document.querySelectorAll("[data-lvl]").forEach(function(b){b.classList.remove("on")});t.classList.add("on");return}
   if(t.id==="go"){var on=document.querySelector("[data-lvl].on");newGame(on?on.getAttribute("data-lvl"):"nov");return}
   if(t.id==="rsend"){sendReport();return}
-  if(t.hasAttribute("data-inc")){incAnswer(t.getAttribute("data-inc"),t.getAttribute("data-ok"));return}
+  if(t.hasAttribute("data-inc")){incAnswer(t.getAttribute("data-inc"),t.getAttribute("data-k"));return}
+  if(t.id==="frok"){frDone();return}
+  if(t.hasAttribute("data-fr")){var k=t.getAttribute("data-fr");S.fr[k]=S.fr[k]?0:1;frUpd();return}
+  if(t.getAttribute("data-a")==="room_frame"&&S&&!S.modal&&!has("room_frame")&&STEPS[S.idx]&&STEPS[S.idx].id==="room"){openFrame();return}
+  if(t.hasAttribute("data-fx")){fixClick(t.getAttribute("data-fx"));return}
   if(t.hasAttribute("data-restart")){newGame(t.getAttribute("data-restart"));return}
   if(t.hasAttribute("data-menu")){startMenu();return}
   if(!S||S.modal)return;
@@ -445,7 +653,7 @@ document.addEventListener("click",function(e){
 setInterval(function(){if(S){if(!S.over){if(!S.modal){if(has("pc_on")){S.clock+=1;$("clk").textContent=fmt(S.clock%1440);var bg=document.querySelector(".big");if(bg)bg.textContent=fmt(S.clock%1440)}}}}},20000);
 S={mode:"nov",idx:0,done:[],score:0,clock:START,mist:[],log:[],win:"desk",tab:"google",msgs:[],mmsgs:[],incPlan:[],incShown:[],queue:[],modal:true,t0:Date.now()};
 renderBrief();render();startMenu();
-window.__sim={get:function(){return S},steps:STEPS};
+window.__sim={get:function(){return S},steps:STEPS,inc:INC};
 })();
 </script>
 </body>
