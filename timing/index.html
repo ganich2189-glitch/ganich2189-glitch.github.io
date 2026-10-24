@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MENSORRY · тайминги</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0a0a0b; --card:#131316; --card2:#18181c; --line:#232327; --txt:#e4e4e7; --num:#fafafa; --mut:#71717a;
+    --acc:#8b5cf6; --acc2:#a78bfa; --green:#22c55e; --red:#ef4444; --day:#fcd34d; --night:#c4b5fd;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  body{padding:24px}
+  .wrap{max-width:1400px;margin:0 auto}
+  .num{font-variant-numeric:tabular-nums}
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  h1{margin:0;font-size:24px;font-weight:700;color:var(--num);letter-spacing:-.02em}
+  .sub{color:var(--mut);font-size:13px;margin-top:4px}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 12px var(--acc);margin-right:8px;vertical-align:middle}
+  .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:20px}
+  .chips{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;gap:2px}
+  .chip{border:0;background:transparent;color:var(--mut);font:600 13px Inter,sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
+  .chip:hover{color:var(--txt)}
+  .chip.on{background:var(--acc);color:#fff;box-shadow:0 4px 14px rgba(139,92,246,.35)}
+  .sel{position:relative}
+  .sel select{appearance:none;-webkit-appearance:none;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:999px;
+    font:500 13px Inter,sans-serif;padding:10px 38px 10px 16px;cursor:pointer;min-width:180px;max-width:320px;outline:none;transition:.15s}
+  .sel select:hover,.sel select:focus{border-color:#3f3f46}
+  .sel::after{content:"";position:absolute;right:16px;top:50%;width:7px;height:7px;border-right:2px solid var(--mut);border-bottom:2px solid var(--mut);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+  .sel select option{background:#18181c;color:var(--txt)}
+  .reset{background:transparent;border:1px solid var(--line);color:var(--mut);border-radius:999px;padding:10px 16px;font:500 13px Inter,sans-serif;cursor:pointer}
+  .reset:hover{color:var(--txt);border-color:#3f3f46}
+  .hbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 10px 30px -12px rgba(0,0,0,.6)}
+  .grid{display:grid;gap:16px}
+  .kpis{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}
+  .kpi .lbl{color:var(--mut);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:8px}
+  .kpi .ico{width:28px;height:28px;border-radius:9px;display:inline-grid;place-items:center;background:rgba(139,92,246,.14);color:var(--acc2);font-size:14px}
+  .kpi .val{color:var(--num);font-size:34px;font-weight:800;letter-spacing:-.03em;margin:14px 0 6px;line-height:1.05;white-space:nowrap}
+  .kpi .hint{color:var(--mut);font-size:12px}
+  .note{color:var(--mut);font-size:13px;margin:0 0 16px;line-height:1.45}
+  .callout{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);border-radius:14px;padding:12px 16px;font-size:13px;color:var(--txt);margin-bottom:16px;line-height:1.45}
+  .callout b{color:var(--acc2)}
+  .row2{grid-template-columns:minmax(0,1fr) minmax(0,1fr);margin-bottom:16px}
+  .ttl{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+  .ttl h3{margin:0;font-size:15px;font-weight:600;color:var(--num)}
+  .ttl span{color:var(--mut);font-size:12px}
+  .chartbox{position:relative;height:300px}
+  .heatwrap{overflow-x:auto}
+  .heat{display:grid;grid-template-columns:36px repeat(24,minmax(18px,1fr));gap:3px;min-width:620px}
+  .heat .hd,.heat .rl{color:var(--mut);font-size:10px;font-weight:600;text-align:center;line-height:18px}
+  .heat .rl{text-align:right;padding-right:4px}
+  .heat .cell{height:22px;border-radius:4px;background:#1a1a1f;position:relative}
+  .heat .cell[data-v="0"]{background:#16161a}
+  .tbl{width:100%;border-collapse:separate;border-spacing:0 6px;font-size:13px}
+  .tbl th{color:var(--mut);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;text-align:left;padding:4px 12px}
+  .tbl th.r,.tbl td.r{text-align:right}
+  .tbl td{background:var(--card2);padding:11px 12px;white-space:nowrap}
+  .tbl td:first-child{border-radius:12px 0 0 12px}
+  .tbl td:last-child{border-radius:0 12px 12px 0}
+  .tbl tr:hover td{background:#1d1d22}
+  .tbl .team{color:var(--num);font-weight:600}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600}
+  .pill.ok{color:var(--green);background:rgba(34,197,94,.12)}
+  .pill.warn{color:#fbbf24;background:rgba(251,191,36,.12)}
+  .pill.bad{color:#f87171;background:rgba(239,68,68,.12)}
+  .pill.flat{color:var(--mut);background:rgba(113,113,122,.14)}
+  .tablewrap{overflow-x:auto;max-height:560px;overflow-y:auto}
+  .empty{color:var(--mut);text-align:center;padding:40px 0;font-size:14px}
+  .foot{color:var(--mut);font-size:12px;margin-top:18px;text-align:center}
+  @media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.row2{grid-template-columns:1fr}}
+  @media (max-width:560px){body{padding:14px}.kpis{grid-template-columns:1fr}.kpi .val{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1><span class="dot"></span>MENSORRY · тайминги</h1>
+      <div class="sub" id="sub">План–факт выхода, длительность и сетка стартов</div>
+    </div>
+    <div class="hbtns">
+      <button class="reset" id="refresh" type="button">⟳ Обновить</button>
+    </div>
+  </header>
+
+  <div class="callout" id="callout"></div>
+
+  <div class="filters">
+    <div class="chips" id="chips">
+      <button class="chip on" data-p="week" type="button">Неделя</button>
+      <button class="chip" data-p="month" type="button">30 дней</button>
+    </div>
+    <div class="sel"><select id="fTeam"></select></div>
+    <button class="reset" id="reset" type="button">Сбросить</button>
+  </div>
+  <p class="note" id="periodNote"></p>
+
+  <div class="grid kpis">
+    <div class="card kpi"><div class="lbl"><span class="ico">◷</span>Смен</div><div class="val num" id="kShifts">—</div><div class="hint" id="hShifts"></div></div>
+    <div class="card kpi"><div class="lbl"><span class="ico">⌛</span>% опозданий</div><div class="val num" id="kLate">—</div><div class="hint" id="hLate"></div></div>
+    <div class="card kpi"><div class="lbl"><span class="ico">◎</span>Средняя длительность</div><div class="val num" id="kDur">—</div><div class="hint">факт, подсчитанные</div></div>
+    <div class="card kpi"><div class="lbl"><span class="ico">Δ</span>Факт − план</div><div class="val num" id="kDelta">—</div><div class="hint">среднее по длительности</div></div>
+  </div>
+
+  <div class="grid row2">
+    <div class="card">
+      <div class="ttl"><h3>Опоздания по командам</h3><span>сдвиги &gt;5 мин</span></div>
+      <div class="chartbox"><canvas id="cBars"></canvas></div>
+      <div class="empty" id="barsEmpty" style="display:none">Нет данных по фильтру</div>
+    </div>
+    <div class="card">
+      <div class="ttl"><h3>Длительность по дням</h3><span>средняя, часы</span></div>
+      <div class="chartbox"><canvas id="cDur"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="ttl"><h3>Сетка стартов</h3><span>день недели × час · МСК</span></div>
+    <div class="heatwrap"><div class="heat" id="heat"></div></div>
+  </div>
+
+  <div class="card">
+    <div class="ttl"><h3>Последние смены</h3><span id="tblNote"></span></div>
+    <div class="tablewrap"><table class="tbl" id="tbl"></table></div>
+  </div>
+
+  <p class="foot">Снимок CRM · обновление страницы не тянет CRM · план из «ВЛГ. РАСПИСАНИЕ КОМАНДЫ»</p>
+</div>
+
+<script>
+const DATA = {"meta":{"asOf":"24.10.2026 17:32 МСК","from":"24.09.2026","to":"24.10.2026","n":247,"joined":182,"joinPct":73.7,"planSlots":219},"week":{"kpi":{"shifts":54,"counted":43,"failed":9,"withPlan":46,"joinPct":85.2,"lateN":17,"latePct":37.0,"avgLate":2,"avgDur":527,"avgDelta":10},"bars":[{"label":"Сафарова / Кан","value":3,"display":"3","meta":"ср. 46м"},{"label":"Ручка / Федулова","value":3,"display":"3","meta":"ср. 1ч 57м"},{"label":"Кирилина","value":2,"display":"2","meta":"ср. 8м"},{"label":"Янипович","value":2,"display":"2","meta":"ср. 21м"},{"label":"Карабанова","value":1,"display":"1","meta":"ср. −48м"},{"label":"Емельянникова / Ратынская","value":1,"display":"1","meta":"ср. −9м"},{"label":"Мануковская","value":1,"display":"1","meta":"ср. −40м"},{"label":"Ткаченко","value":1,"display":"1","meta":"ср. −11м"},{"label":"Стульнева","value":1,"display":"1","meta":"ср. −4м"},{"label":"Чеботарева","value":1,"display":"1","meta":"ср. −37м"}],"heat":[[0,0,0,0,0,0,0,0,2,1,1,1,0,1,0,0,0,0,0,1,0,0,2,1],[1,0,0,0,0,0,0,0,0,2,1,0,0,1,0,0,0,0,0,0,0,0,4,1],[0,0,0,0,0,0,0,0,2,2,2,1,0,0,1,0,0,0,0,1,0,0,1,0],[0,0,0,0,0,0,0,0,1,4,1,0,1,0,0,0,0,0,0,1,0,0,3,0],[0,0,0,0,0,0,1,1,0,0,1,0,0,0,1,1,0,0,0,0,0,0,1,0],[0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],[0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,0]],"dur":[{"label":"18.10","value":9.89,"display":"9ч 54м"},{"label":"19.10","value":8.47,"display":"8ч 28м"},{"label":"20.10","value":7.88,"display":"7ч 53м"},{"label":"21.10","value":10.57,"display":"10ч 34м"},{"label":"22.10","value":8.82,"display":"8ч 49м"},{"label":"23.10","value":7.79,"display":"7ч 47м"}],"table":[{"t":"Карабанова","p":"NIGHT 22:00–07:30","f":"24.10 22:00 → 25.10 07:30","l":"0м","d":"9ч 30м","st":"Предварительно","tone":"warning","team":"Карабанова"},{"t":"Емельянникова / Ратынская","p":"DAY 10:30–20:00","f":"24.10 09:58 → 24.10 20:00","l":"−32м","d":"10ч 02м","st":"Идет смена","tone":"warning","team":"Емельянникова / Ратынская"},{"t":"Сафарова / Кан","p":"NIGHT 22:00–07:30","f":"23.10 22:38 → 24.10 08:24","l":"38м","d":"9ч 46м","st":"Подсчитана","tone":"success","team":"Сафарова / Кан"},{"t":"Чернорубашкина","p":"—","f":"23.10 15:00 → 23.10 19:07","l":"—","d":"4ч 07м","st":"Подсчитана","tone":"success","team":"Чернорубашкина"},{"t":"Каехтина","p":"—","f":"23.10 14:44 → 23.10 19:06","l":"—","d":"4ч 22м","st":"Подсчитана","tone":"success","team":"Каехтина"},{"t":"Емельянникова / Ратынская","p":"DAY 10:30–20:00","f":"23.10 10:04 → 23.10 17:08","l":"−26м","d":"7ч 04м","st":"Подсчитана","tone":"success","team":"Емельянникова / Ратынская"},{"t":"Ткаченко","p":"DAY 09:00–18:30","f":"23.10 07:05 → 23.10 17:37","l":"−1ч 55м","d":"10ч 32м","st":"Подсчитана","tone":"success","team":"Ткаченко"},{"t":"Мануковская","p":"DAY 09:00–18:30","f":"23.10 06:55 → 23.10 17:47","l":"−2ч 05м","d":"10ч 52м","st":"Подсчитана","tone":"success","team":"Мануковская"},{"t":"Ручка / Федулова","p":"NIGHT 21:00–06:30","f":"22.10 22:09 → 23.10 07:44","l":"1ч 09м","d":"9ч 35м","st":"Подсчитана","tone":"success","team":"Ручка / Федулова"},{"t":"Стульнева","p":"NIGHT 22:00–07:30","f":"22.10 22:00 → 23.10 07:30","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Стульнева"},{"t":"Сафарова / Кан","p":"NIGHT 22:00–07:30","f":"22.10 22:00 → 23.10 07:30","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Сафарова / Кан"},{"t":"Карабанова","p":"NIGHT 21:00–06:30","f":"22.10 19:09 → 23.10 04:33","l":"−1ч 51м","d":"9ч 24м","st":"Подсчитана","tone":"success","team":"Карабанова"},{"t":"Сухова","p":"—","f":"22.10 12:07 → 22.10 15:01","l":"—","d":"2ч 54м","st":"Подсчитана","tone":"success","team":"Сухова"},{"t":"Емельянникова / Ратынская","p":"DAY 10:30–20:00","f":"22.10 10:30 → 22.10 20:00","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Емельянникова / Ратынская"},{"t":"Кирилина","p":"DAY 10:00–19:30","f":"22.10 09:42 → 22.10 19:54","l":"−18м","d":"10ч 12м","st":"Подсчитана","tone":"success","team":"Кирилина"},{"t":"Чеботарева","p":"DAY 09:00–18:30","f":"22.10 09:10 → 22.10 20:00","l":"10м","d":"10ч 50м","st":"Подсчитана","tone":"success","team":"Чеботарева"},{"t":"Ткаченко","p":"DAY 09:00–18:30","f":"22.10 09:01 → 22.10 17:55","l":"1м","d":"8ч 54м","st":"Подсчитана","tone":"success","team":"Ткаченко"},{"t":"Бурхатова","p":"DAY 09:00–18:30","f":"22.10 09:00 → 22.10 18:30","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Бурхатова"},{"t":"Мануковская","p":"DAY 09:00–18:30","f":"22.10 08:41 → 22.10 18:38","l":"−19м","d":"9ч 57м","st":"Подсчитана","tone":"success","team":"Мануковская"},{"t":"Янипович","p":"NIGHT 22:00–07:30","f":"21.10 22:00 → 22.10 07:30","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Янипович"},{"t":"Карабанова","p":"NIGHT 21:00–06:30","f":"21.10 19:00 → 22.10 04:54","l":"−2ч 00м","d":"9ч 54м","st":"Подсчитана","tone":"success","team":"Карабанова"},{"t":"Сухова","p":"—","f":"21.10 14:02 → 21.10 19:33","l":"—","d":"5ч 31м","st":"Подсчитана","tone":"success","team":"Сухова"},{"t":"Сергеева","p":"—","f":"21.10 11:31 → 21.10 17:31","l":"—","d":"6ч 00м","st":"Подсчитана","tone":"success","team":"Сергеева"},{"t":"Емельянникова / Ратынская","p":"DAY 10:30–20:00","f":"21.10 10:30 → 21.10 20:00","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Емельянникова / Ратынская"},{"t":"Кирилина","p":"DAY 10:30–20:00","f":"21.10 10:30 → 21.10 20:00","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Кирилина"}],"teams":["Бурхатова","Емельянникова / Ратынская","Каехтина","Карабанова","Кирилина","Мануковская","Ручка / Федулова","Сафарова","Сафарова / Кан","Сергеева","Стульнева","Сухова","Ткаченко","Чеботарева","Чернорубашкина","Швыдкая","Янипович"]},"month":{"kpi":{"shifts":240,"counted":208,"failed":30,"withPlan":178,"joinPct":74.2,"lateN":80,"latePct":44.9,"avgLate":13,"avgDur":488,"avgDelta":-16},"bars":[{"label":"Ткаченко","value":13,"display":"13","meta":"ср. 17м"},{"label":"Кирилина","value":9,"display":"9","meta":"ср. 5м"},{"label":"Емельянникова / Ратынская","value":7,"display":"7","meta":"ср. 0м"},{"label":"Чеботарева","value":7,"display":"7","meta":"ср. 20м"},{"label":"Сафарова","value":6,"display":"6","meta":"ср. −3м"},{"label":"Янипович","value":5,"display":"5","meta":"ср. 18м"},{"label":"Арсентьева","value":5,"display":"5","meta":"ср. 13м"},{"label":"Кан","value":4,"display":"4","meta":"ср. 23м"},{"label":"Сафарова / Кан","value":3,"display":"3","meta":"ср. 46м"},{"label":"Мануковская","value":3,"display":"3","meta":"ср. −16м"}],"heat":[[0,0,0,0,0,0,0,0,2,4,9,2,4,1,1,3,0,0,0,1,0,1,7,1],[1,0,0,0,0,0,0,0,2,5,11,2,0,1,4,1,0,0,0,0,0,3,8,1],[0,0,0,0,0,0,0,0,2,7,11,2,1,0,3,2,1,0,0,1,0,3,6,0],[0,0,0,0,0,0,0,1,2,9,6,1,3,2,1,1,0,0,0,1,1,2,6,1],[0,0,0,0,0,0,1,2,3,6,9,4,0,3,1,4,0,1,0,1,0,4,4,1],[0,0,0,0,0,0,0,0,0,5,9,0,4,3,2,0,0,0,0,0,0,0,2,1],[0,0,1,0,0,0,0,0,0,3,2,1,4,1,2,1,0,0,0,0,1,1,2,0]],"dur":[{"label":"25.09","value":7.51,"display":"7ч 31м"},{"label":"","value":7.84,"display":"7ч 51м"},{"label":"","value":7.06,"display":"7ч 04м"},{"label":"","value":8.02,"display":"8ч 01м"},{"label":"","value":8.56,"display":"8ч 34м"},{"label":"30.09","value":8.91,"display":"8ч 54м"},{"label":"","value":9.14,"display":"9ч 08м"},{"label":"","value":8.69,"display":"8ч 42м"},{"label":"","value":6.95,"display":"6ч 57м"},{"label":"","value":9.0,"display":"9ч 00м"},{"label":"05.10","value":5.71,"display":"5ч 43м"},{"label":"","value":7.78,"display":"7ч 47м"},{"label":"","value":8.24,"display":"8ч 14м"},{"label":"","value":7.76,"display":"7ч 46м"},{"label":"","value":9.15,"display":"9ч 09м"},{"label":"10.10","value":5.94,"display":"5ч 56м"},{"label":"","value":6.89,"display":"6ч 53м"},{"label":"","value":7.34,"display":"7ч 20м"},{"label":"","value":7.12,"display":"7ч 07м"},{"label":"","value":10.44,"display":"10ч 27м"},{"label":"15.10","value":7.72,"display":"7ч 43м"},{"label":"","value":8.34,"display":"8ч 20м"},{"label":"","value":7.42,"display":"7ч 25м"},{"label":"","value":9.89,"display":"9ч 54м"},{"label":"","value":8.47,"display":"8ч 28м"},{"label":"20.10","value":7.88,"display":"7ч 53м"},{"label":"","value":10.57,"display":"10ч 34м"},{"label":"","value":8.82,"display":"8ч 49м"},{"label":"23.10","value":7.79,"display":"7ч 47м"}],"table":[{"t":"Карабанова","p":"NIGHT 22:00–07:30","f":"24.10 22:00 → 25.10 07:30","l":"0м","d":"9ч 30м","st":"Предварительно","tone":"warning","team":"Карабанова"},{"t":"Емельянникова / Ратынская","p":"DAY 10:30–20:00","f":"24.10 09:58 → 24.10 20:00","l":"−32м","d":"10ч 02м","st":"Идет смена","tone":"warning","team":"Емельянникова / Ратынская"},{"t":"Сафарова / Кан","p":"NIGHT 22:00–07:30","f":"23.10 22:38 → 24.10 08:24","l":"38м","d":"9ч 46м","st":"Подсчитана","tone":"success","team":"Сафарова / Кан"},{"t":"Чернорубашкина","p":"—","f":"23.10 15:00 → 23.10 19:07","l":"—","d":"4ч 07м","st":"Подсчитана","tone":"success","team":"Чернорубашкина"},{"t":"Каехтина","p":"—","f":"23.10 14:44 → 23.10 19:06","l":"—","d":"4ч 22м","st":"Подсчитана","tone":"success","team":"Каехтина"},{"t":"Емельянникова / Ратынская","p":"DAY 10:30–20:00","f":"23.10 10:04 → 23.10 17:08","l":"−26м","d":"7ч 04м","st":"Подсчитана","tone":"success","team":"Емельянникова / Ратынская"},{"t":"Ткаченко","p":"DAY 09:00–18:30","f":"23.10 07:05 → 23.10 17:37","l":"−1ч 55м","d":"10ч 32м","st":"Подсчитана","tone":"success","team":"Ткаченко"},{"t":"Мануковская","p":"DAY 09:00–18:30","f":"23.10 06:55 → 23.10 17:47","l":"−2ч 05м","d":"10ч 52м","st":"Подсчитана","tone":"success","team":"Мануковская"},{"t":"Ручка / Федулова","p":"NIGHT 21:00–06:30","f":"22.10 22:09 → 23.10 07:44","l":"1ч 09м","d":"9ч 35м","st":"Подсчитана","tone":"success","team":"Ручка / Федулова"},{"t":"Стульнева","p":"NIGHT 22:00–07:30","f":"22.10 22:00 → 23.10 07:30","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Стульнева"},{"t":"Сафарова / Кан","p":"NIGHT 22:00–07:30","f":"22.10 22:00 → 23.10 07:30","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Сафарова / Кан"},{"t":"Карабанова","p":"NIGHT 21:00–06:30","f":"22.10 19:09 → 23.10 04:33","l":"−1ч 51м","d":"9ч 24м","st":"Подсчитана","tone":"success","team":"Карабанова"},{"t":"Сухова","p":"—","f":"22.10 12:07 → 22.10 15:01","l":"—","d":"2ч 54м","st":"Подсчитана","tone":"success","team":"Сухова"},{"t":"Емельянникова / Ратынская","p":"DAY 10:30–20:00","f":"22.10 10:30 → 22.10 20:00","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Емельянникова / Ратынская"},{"t":"Кирилина","p":"DAY 10:00–19:30","f":"22.10 09:42 → 22.10 19:54","l":"−18м","d":"10ч 12м","st":"Подсчитана","tone":"success","team":"Кирилина"},{"t":"Чеботарева","p":"DAY 09:00–18:30","f":"22.10 09:10 → 22.10 20:00","l":"10м","d":"10ч 50м","st":"Подсчитана","tone":"success","team":"Чеботарева"},{"t":"Ткаченко","p":"DAY 09:00–18:30","f":"22.10 09:01 → 22.10 17:55","l":"1м","d":"8ч 54м","st":"Подсчитана","tone":"success","team":"Ткаченко"},{"t":"Бурхатова","p":"DAY 09:00–18:30","f":"22.10 09:00 → 22.10 18:30","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Бурхатова"},{"t":"Мануковская","p":"DAY 09:00–18:30","f":"22.10 08:41 → 22.10 18:38","l":"−19м","d":"9ч 57м","st":"Подсчитана","tone":"success","team":"Мануковская"},{"t":"Янипович","p":"NIGHT 22:00–07:30","f":"21.10 22:00 → 22.10 07:30","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Янипович"},{"t":"Карабанова","p":"NIGHT 21:00–06:30","f":"21.10 19:00 → 22.10 04:54","l":"−2ч 00м","d":"9ч 54м","st":"Подсчитана","tone":"success","team":"Карабанова"},{"t":"Сухова","p":"—","f":"21.10 14:02 → 21.10 19:33","l":"—","d":"5ч 31м","st":"Подсчитана","tone":"success","team":"Сухова"},{"t":"Сергеева","p":"—","f":"21.10 11:31 → 21.10 17:31","l":"—","d":"6ч 00м","st":"Подсчитана","tone":"success","team":"Сергеева"},{"t":"Емельянникова / Ратынская","p":"DAY 10:30–20:00","f":"21.10 10:30 → 21.10 20:00","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Емельянникова / Ратынская"},{"t":"Кирилина","p":"DAY 10:30–20:00","f":"21.10 10:30 → 21.10 20:00","l":"0м","d":"9ч 30м","st":"Несостоявшаяся","tone":"danger","team":"Кирилина"}],"teams":["Арсентьева","Безбородова","Билюк","Бурхатова","Грешнова","Губанова","Дорофеева","Емельянникова / Ратынская","Ермолаева","Забродина","Зинченко","Игнатьева","Илларионова","Каехтина","Камалова","Кан","Карабанова","Кирилина","Корень","Костырко","Кочетова","Мануковская","Маргоскина","Пискунова","Редина","Ромазова","Ручка","Ручка / Федулова","Сафарова","Сафарова / Кан","Седельникова","Сергеева","Соболева","Стульнева","Суйковa","Сухова","Танкаева","Тимофеева","Тимофеева / Арсентьева","Ткаченко","Федулова","Хугаева","Чеботарева","Чернорубашкина","Швыдкая","Шпилинова","Янипович"]},"weekLabel":"Неделя 18.10–24.10","monthLabel":"30 дней 25.09–24.10"};
+const WD = ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
+const HOURS = ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"];
+
+let period = "week";
+let team = "";
+let CH = {bars:null, dur:null};
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function fmtMin(m){
+  if(m===null||m===undefined) return "—";
+  const sign = m<0?"−":"";
+  const abs = Math.abs(m);
+  const h = Math.floor(abs/60), mm = abs%60;
+  if(h>0) return sign+h+"ч "+String(mm).padStart(2,"0")+"м";
+  return sign+mm+"м";
+}
+function fmtHm(m){
+  if(m===null||m===undefined) return "—";
+  const h = Math.floor(m/60), mm = m%60;
+  return h+"ч "+String(mm).padStart(2,"0")+"м";
+}
+function block(){ return period==="week" ? DATA.week : DATA.month; }
+function periodLabel(){ return period==="week" ? DATA.weekLabel : DATA.monthLabel; }
+
+function fillTeams(){
+  const b = block();
+  const el = document.getElementById("fTeam");
+  const cur = team;
+  el.innerHTML = '<option value="">Все команды</option>' +
+    b.teams.map(t => '<option value="'+esc(t)+'"'+(t===cur?" selected":"")+'>'+esc(t)+'</option>').join("");
+  if(cur && !b.teams.includes(cur)){ team=""; el.value=""; }
+}
+
+function destroyChart(key){
+  if(CH[key]){ CH[key].destroy(); CH[key]=null; }
+}
+
+function renderBars(bars){
+  destroyChart("bars");
+  const empty = document.getElementById("barsEmpty");
+  const canvas = document.getElementById("cBars");
+  if(!bars.length){
+    canvas.style.display="none"; empty.style.display="block"; return;
+  }
+  canvas.style.display="block"; empty.style.display="none";
+  const labels = bars.map(b=>b.label);
+  const vals = bars.map(b=>b.value);
+  const metas = bars.map(b=>b.meta||"");
+  CH.bars = new Chart(canvas.getContext("2d"), {
+    type:"bar",
+    data:{ labels, datasets:[{
+      data: vals,
+      backgroundColor: "rgba(139,92,246,.75)",
+      hoverBackgroundColor: "rgba(167,139,250,.95)",
+      borderRadius: 8,
+      borderSkipped: false,
+      maxBarThickness: 28
+    }]},
+    options:{
+      indexAxis:"y",
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{
+          afterLabel: function(ctx){ return metas[ctx.dataIndex]||""; }
+        }}
+      },
+      scales:{
+        x:{ grid:{color:"#232327"}, ticks:{color:"#71717a", precision:0}, beginAtZero:true },
+        y:{ grid:{display:false}, ticks:{color:"#e4e4e7", font:{size:11}} }
+      }
+    }
+  });
+}
+
+function renderDur(dur){
+  destroyChart("dur");
+  const labels = dur.map(d=>d.label||"");
+  const vals = dur.map(d=>d.value);
+  const displays = dur.map(d=>d.display||"");
+  CH.dur = new Chart(document.getElementById("cDur").getContext("2d"), {
+    type:"bar",
+    data:{ labels, datasets:[{
+      data: vals,
+      backgroundColor: "rgba(167,139,250,.55)",
+      hoverBackgroundColor: "rgba(139,92,246,.9)",
+      borderRadius: 6,
+      borderSkipped: false,
+      maxBarThickness: 22
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{
+          label: function(ctx){ return displays[ctx.dataIndex]||(ctx.parsed.y+" ч"); }
+        }}
+      },
+      scales:{
+        x:{ grid:{display:false}, ticks:{color:"#71717a", maxRotation:0, autoSkip:true, maxTicksLimit:10} },
+        y:{ grid:{color:"#232327"}, ticks:{color:"#71717a", callback:v=>v+"ч"}, beginAtZero:true }
+      }
+    }
+  });
+}
+
+function renderHeat(heat){
+  let max = 1;
+  heat.forEach(row => row.forEach(v => { if(v>max) max=v; }));
+  const root = document.getElementById("heat");
+  let html = '<div class="hd"></div>' + HOURS.map(h=>'<div class="hd">'+h+'</div>').join("");
+  for(let r=0;r<7;r++){
+    html += '<div class="rl">'+WD[r]+'</div>';
+    for(let c=0;c<24;c++){
+      const v = (heat[r]&&heat[r][c])||0;
+      let bg = "#16161a";
+      if(v>0){
+        const t = v/max;
+        const a = 0.18 + t*0.82;
+        bg = "rgba(139,92,246,"+a.toFixed(2)+")";
+      }
+      html += '<div class="cell" data-v="'+v+'" title="'+WD[r]+' '+c+':00 — '+v+'" style="background:'+bg+'"></div>';
+    }
+  }
+  root.innerHTML = html;
+}
+
+function tonePill(tone, st){
+  const cls = tone==="success"?"ok":tone==="warning"?"warn":tone==="danger"?"bad":"flat";
+  return '<span class="pill '+cls+'">'+esc(st)+'</span>';
+}
+
+function renderTable(rows){
+  const tbl = document.getElementById("tbl");
+  document.getElementById("tblNote").textContent = rows.length ? (rows.length+" строк") : "";
+  if(!rows.length){
+    tbl.innerHTML = '<tr><td class="empty" colspan="6">Нет смен по фильтру</td></tr>';
+    return;
+  }
+  let html = '<thead><tr><th>Команда</th><th>План</th><th>Факт</th><th class="r">Опозд.</th><th class="r">Длит.</th><th>Статус</th></tr></thead><tbody>';
+  rows.forEach(r=>{
+    html += '<tr><td class="team">'+esc(r.t)+'</td><td>'+esc(r.p)+'</td><td class="num">'+esc(r.f)+'</td><td class="r num">'+esc(r.l)+'</td><td class="r num">'+esc(r.d)+'</td><td>'+tonePill(r.tone,r.st)+'</td></tr>';
+  });
+  html += '</tbody>';
+  tbl.innerHTML = html;
+}
+
+function render(){
+  const b = block();
+  const k = b.kpi;
+  document.getElementById("callout").innerHTML =
+    '<b>Снимок</b> · CRM '+esc(DATA.meta.from)+'–'+esc(DATA.meta.to)+': '+DATA.meta.n+' смен, стыковка с планом '+
+    DATA.meta.joined+' ('+DATA.meta.joinPct+'%). Снимок от '+esc(DATA.meta.asOf)+'. «Сбросить» только сбрасывает вид — CRM не тянет.';
+  document.getElementById("sub").textContent = "Снимок "+DATA.meta.asOf;
+  document.getElementById("periodNote").textContent =
+    "Период: "+periodLabel()+(team?" · команда "+team:"")+". KPI, сетка и длительность — по всему периоду; рейтинг опозданий и таблица учитывают фильтр команды.";
+
+  document.getElementById("kShifts").textContent = String(k.shifts);
+  document.getElementById("hShifts").textContent = "подсчитано "+k.counted+" · срыв "+k.failed;
+  document.getElementById("kLate").textContent = (k.latePct!==null&&k.latePct!==undefined)?(k.latePct+"%"):"—";
+  document.getElementById("hLate").textContent = k.withPlan>0 ? (k.lateN+" из "+k.withPlan+" с планом") : "нет стыковки с планом";
+  document.getElementById("kDur").textContent = fmtHm(k.avgDur);
+  document.getElementById("kDelta").textContent = fmtMin(k.avgDelta);
+
+  let bars = b.bars;
+  let table = b.table;
+  if(team){
+    bars = bars.filter(x => x.label===team);
+    table = table.filter(x => x.team===team);
+  }
+  renderBars(bars);
+  renderDur(b.dur);
+  renderHeat(b.heat);
+  renderTable(table);
+}
+
+document.getElementById("chips").addEventListener("click", e=>{
+  const btn = e.target.closest(".chip"); if(!btn) return;
+  period = btn.dataset.p;
+  team = "";
+  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on", c===btn));
+  fillTeams();
+  render();
+});
+document.getElementById("fTeam").addEventListener("change", e=>{ team = e.target.value; render(); });
+document.getElementById("reset").addEventListener("click", ()=>{
+  period="week"; team="";
+  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on", c.dataset.p==="week"));
+  fillTeams(); render();
+});
+document.getElementById("refresh").addEventListener("click", ()=> location.reload());
+
+fillTeams();
+render();
+</script>
+</body>
+</html>
